@@ -1,0 +1,1367 @@
+<title>Správa ubytování</title>
+<style>
+:root{
+  --bg:#f4f5f7;--card:#fff;--ink:#1d2433;--muted:#6b7385;--line:#e3e6ec;
+  --pri:#2457d6;--pri-ink:#fff;--ok:#1a8a4a;--ok-bg:#e5f5ec;--warn:#a86a00;--warn-bg:#fff4dc;
+  --bad:#c2312f;--bad-bg:#fde9e8;--info:#2457d6;--info-bg:#e8eefc;--side:#18202f;--side-ink:#cfd6e4;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;
+  --bg:#11151d;--card:#1a202b;--ink:#e6e9ef;--muted:#98a1b3;--line:#2b3342;
+  --pri:#5b8cff;--ok:#4cc883;--ok-bg:#16301f;--warn:#e7ad3c;--warn-bg:#33280f;--bad:#ff6f6b;--bad-bg:#3a1a1a;
+  --info:#7ea4ff;--info-bg:#1b2643;--side:#0c1017;
+}}
+:root[data-theme="dark"]{color-scheme:dark;
+  --bg:#11151d;--card:#1a202b;--ink:#e6e9ef;--muted:#98a1b3;--line:#2b3342;
+  --pri:#5b8cff;--ok:#4cc883;--ok-bg:#16301f;--warn:#e7ad3c;--warn-bg:#33280f;--bad:#ff6f6b;--bad-bg:#3a1a1a;
+  --info:#7ea4ff;--info-bg:#1b2643;--side:#0c1017;
+}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink)}
+.hidden{display:none!important}
+h1,h2,h3{margin:0 0 .5em}
+h2{font-size:20px}h3{font-size:15px}
+.muted{color:var(--muted)}.small{font-size:12px}.err{color:var(--bad)}
+.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+#app{display:flex;min-height:100vh}
+.side{width:220px;background:var(--side);color:var(--side-ink);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;flex-shrink:0}
+.brand{font-weight:700;font-size:16px;padding:18px 18px 12px;color:#fff}
+nav{flex:1;overflow:auto}
+nav a{display:flex;justify-content:space-between;padding:9px 18px;color:var(--side-ink);text-decoration:none;border-left:3px solid transparent}
+nav a:hover{background:#ffffff10}
+nav a.on{background:#ffffff14;border-left-color:var(--pri);color:#fff}
+nav .badge{background:var(--bad);color:#fff;border-radius:10px;padding:0 7px;font-size:11px;line-height:18px}
+.who{padding:14px 18px;border-top:1px solid #ffffff18;font-size:12px}
+.who a{color:#9db8ff;cursor:pointer}
+main{flex:1;min-width:0}
+.top{display:flex;align-items:center;gap:12px;padding:16px 24px;border-bottom:1px solid var(--line);background:var(--card);position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+.top h2{margin:0;flex:1}
+.menu{display:none}
+#view{padding:20px 24px 60px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px}
+.grid{display:grid;gap:14px}
+.g4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
+.stat .v{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}
+.stat .l{color:var(--muted);font-size:12px}
+.bar{height:6px;background:var(--line);border-radius:3px;margin-top:8px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--pri)}
+table{width:100%;border-collapse:collapse}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:600}
+tr.click{cursor:pointer}tr.click:hover td{background:var(--bg)}
+.tablewrap{overflow-x:auto}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 12px;border-radius:7px;cursor:pointer;font:inherit}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--pri);border-color:var(--pri);color:var(--pri-ink)}
+.btn.danger{color:var(--bad)}
+.btn.ghost{border-color:transparent}
+.btn.sm{padding:3px 8px;font-size:12px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pill{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px;background:var(--line)}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}.pill.warn{background:var(--warn-bg);color:var(--warn)}
+.pill.bad{background:var(--bad-bg);color:var(--bad)}.pill.info{background:var(--info-bg);color:var(--info)}
+.alert{padding:9px 12px;border-radius:8px;margin-bottom:8px}
+.alert.bad{background:var(--bad-bg);color:var(--bad)}.alert.warn{background:var(--warn-bg);color:var(--warn)}
+.alert.info{background:var(--info-bg);color:var(--info)}.alert.ok{background:var(--ok-bg);color:var(--ok)}
+.rooms{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+.room{border:1px solid var(--line);border-radius:8px;padding:8px;cursor:pointer;background:var(--card);min-height:64px}
+.room b{display:block}
+.room .s{font-size:11px;color:var(--muted)}
+.room.free{border-left:4px solid var(--ok)}
+.room.part{border-left:4px solid var(--warn)}
+.room.full{border-left:4px solid var(--pri)}
+.room.maint{opacity:.55;border-left:4px solid var(--muted)}
+.room.debt{box-shadow:inset 0 0 0 2px var(--bad)}
+form label{display:block;margin-bottom:10px;font-size:12px;color:var(--muted)}
+form label input,form label select,form label textarea{display:block;width:100%;margin-top:3px;padding:7px 9px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--ink);font:inherit}
+form label.chk{display:flex;gap:8px;align-items:center;color:var(--ink)}
+form label.chk input{width:auto;margin:0}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.modal{position:fixed;inset:0;background:#0008;display:flex;align-items:flex-start;justify-content:center;padding:6vh 16px;z-index:20;overflow:auto}
+.modal-box{width:100%;max-width:560px}
+.login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+.login-card{width:100%;max-width:360px}
+.login-card .btn{width:100%;margin-top:6px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;z-index:30;max-width:90vw}
+.tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.tabs .btn.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+.mb{margin-bottom:14px}
+code{font-size:11px;word-break:break-all}
+@media (max-width:800px){
+  .side{position:fixed;left:-240px;z-index:15;transition:left .2s}
+  .side.open{left:0}
+  .menu{display:inline-block}
+  #view{padding:14px 16px 60px}
+  .top{padding:12px 16px}
+  .f2{grid-template-columns:1fr}
+}
+@media print{.side,.top,.btn{display:none!important}#view{padding:0}.card{border:0}}
+.receipt td{padding:4px 8px}
+.demo-bar{background:var(--warn-bg);color:var(--warn);padding:8px 16px;font-size:13px;text-align:center}
+
+</style>
+<div class="demo-bar">Webová ukázka. Data jsou smyšlená a ukládají se jen ve vašem prohlížeči. <button class="btn sm" id="demoReset" type="button">Obnovit ukázková data</button></div>
+
+<div id="login" class="login hidden">
+  <form id="loginForm" class="card login-card">
+    <h1>Správa ubytování</h1>
+    <label>Uživatel<input name="username" id="lu" autocomplete="username" value="majitel" required></label>
+    <label>Heslo<input name="password" id="lp" type="password" autocomplete="current-password" value="majitel" required></label>
+    <button class="btn primary">Přihlásit</button>
+    <p class="muted small">Ukázkové účty: <b>majitel</b> / <b>majitel</b> (plná práva) nebo <b>spravce</b> / <b>spravce</b> (správce ubytovny a bytů).</p>
+    <p id="loginErr" class="err"></p>
+  </form>
+</div>
+
+<div id="app" class="hidden">
+  <aside class="side">
+    <div class="brand">Správa ubytování</div>
+    <nav id="nav"></nav>
+    <div class="who" id="who"></div>
+  </aside>
+  <main>
+    <header class="top"><button class="btn ghost menu" id="menuBtn">☰</button><h2 id="title"></h2><div id="actions"></div></header>
+    <section id="view"></section>
+  </main>
+</div>
+
+<div id="modal" class="modal hidden"><div class="modal-box card"><div id="modalBody"></div></div></div>
+<div id="toast" class="toast hidden"></div>
+
+<script>
+"use strict";
+/* Webová ukázka: věrný přepis server.py do JavaScriptu.
+   Běží celé v prohlížeči, data se ukládají jen do prohlížeče návštěvníka (localStorage).
+   Plná verze se serverem a databází je server.py. */
+(function () {
+  // ------------------------------------------------------------ SHA-256 (sync)
+  function sha256(ascii) {
+    const K = [], H = [];
+    let n = 2, c = 0;
+    const isP = x => { for (let i = 2; i * i <= x; i++) if (x % i === 0) return false; return true; };
+    while (c < 64) { if (isP(n)) { if (c < 8) H[c] = (Math.pow(n, 1 / 2) * 2 ** 32) | 0; K[c++] = (Math.pow(n, 1 / 3) * 2 ** 32) | 0; } n++; }
+    const bytes = new TextEncoder().encode(ascii);
+    const l = bytes.length, words = [];
+    for (let i = 0; i < l; i++) words[i >> 2] |= bytes[i] << ((3 - (i % 4)) * 8);
+    words[l >> 2] |= 0x80 << ((3 - (l % 4)) * 8);
+    const total = (((l + 8) >> 6) + 1) * 16;
+    for (let i = words.length; i < total; i++) words[i] = words[i] | 0;
+    words[total - 1] = l * 8;
+    const h = H.slice();
+    const r = (x, k) => (x >>> k) | (x << (32 - k));
+    for (let j = 0; j < total; j += 16) {
+      const w = words.slice(j, j + 16);
+      let [a, b, cc, d, e, f, g, hh] = h;
+      for (let i = 0; i < 64; i++) {
+        if (i >= 16) {
+          const w15 = w[i - 15], w2 = w[i - 2];
+          w[i] = (w[i - 16] + (r(w15, 7) ^ r(w15, 18) ^ (w15 >>> 3)) + w[i - 7] + (r(w2, 17) ^ r(w2, 19) ^ (w2 >>> 10))) | 0;
+        }
+        const t1 = (hh + (r(e, 6) ^ r(e, 11) ^ r(e, 25)) + ((e & f) ^ (~e & g)) + K[i] + w[i]) | 0;
+        const t2 = ((r(a, 2) ^ r(a, 13) ^ r(a, 22)) + ((a & b) ^ (a & cc) ^ (b & cc))) | 0;
+        hh = g; g = f; f = e; e = (d + t1) | 0; d = cc; cc = b; b = a; a = (t1 + t2) | 0;
+      }
+      [a, b, cc, d, e, f, g, hh].forEach((v, i) => h[i] = (h[i] + v) | 0);
+    }
+    return h.map(v => (v >>> 0).toString(16).padStart(8, "0")).join("");
+  }
+
+  // ------------------------------------------------------------ dates
+  const pad = n => String(n).padStart(2, "0");
+  const iso = d => `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
+  const parseD = s => { const [y, m, d] = s.slice(0, 10).split("-").map(Number); return new Date(Date.UTC(y, m - 1, d)); };
+  const todayD = () => { const n = new Date(); return new Date(Date.UTC(n.getFullYear(), n.getMonth(), n.getDate())); };
+  const addDays = (d, k) => new Date(d.getTime() + k * 864e5);
+  const days = (a, b) => Math.round((b - a) / 864e5);
+  const addMonths = (d, k) => {
+    const m = d.getUTCMonth() + k, y = d.getUTCFullYear() + Math.floor(m / 12), mm = ((m % 12) + 12) % 12;
+    const last = new Date(Date.UTC(y, mm + 1, 0)).getUTCDate();
+    return new Date(Date.UTC(y, mm, Math.min(d.getUTCDate(), last)));
+  };
+  const nowIso = () => { const n = new Date(); return `${n.getFullYear()}-${pad(n.getMonth() + 1)}-${pad(n.getDate())}T${pad(n.getHours())}:${pad(n.getMinutes())}:${pad(n.getSeconds())}`; };
+  const round = x => Math.round(x * 100) / 100;
+
+  // ------------------------------------------------------------ state
+  const KEY = "sprava-ubytovani-demo-v1";
+  const TABLES = ["users", "properties", "user_properties", "units", "persons", "stays", "payments", "expenses",
+    "cash_transfers", "cash_closings", "approvals", "belongings", "room_entries", "audit"];
+  let S;
+  const fresh = () => { const s = { settings: { expense_limit: "2000", cash_tolerance: "50", rate_tolerance_pct: "10" }, sessions: {}, seq: {} }; TABLES.forEach(t => s[t] = []); return s; };
+  function insert(t, row) { S.seq[t] = (S.seq[t] || 0) + 1; row.id = S.seq[t]; S[t].push(row); return row; }
+  const get = (t, id) => S[t].find(r => r.id === Number(id));
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { } };
+  const setting = k => Number(S.settings[k]);
+
+  class ApiError extends Error { constructor(m, code = 400) { super(m); this.code = code; } }
+
+  // ------------------------------------------------------------ audit chain
+  function entryHash(prev, ts, uid, uname, action, entity, eid, det) {
+    return sha256([prev, ts, uid ?? "None", uname, action, entity ?? "None", eid ?? "None", det].join("|"));
+  }
+  function audit(user, action, entity = null, entityId = null, details = {}) {
+    const last = S.audit[S.audit.length - 1];
+    const prev = last ? last.hash : "GENESIS";
+    const ts = S._ts || nowIso();
+    const uid = user ? user.id : null, uname = user ? user.username : "system";
+    const det = JSON.stringify(Object.fromEntries(Object.keys(details).sort().map(k => [k, details[k]])));
+    insert("audit", { ts, user_id: uid, username: uname, action, entity, entity_id: entityId, details: det, prev_hash: prev,
+      hash: entryHash(prev, ts, uid, uname, action, entity, entityId, det) });
+  }
+  function verifyAudit() {
+    let prev = "GENESIS", count = 0;
+    for (const r of S.audit) {
+      const h = entryHash(prev, r.ts, r.user_id, r.username, r.action, r.entity, r.entity_id, r.details);
+      if (r.prev_hash !== prev || r.hash !== h) return { ok: false, broken_at: r.id, checked: count };
+      prev = r.hash; count++;
+    }
+    const byYear = {};
+    S.payments.forEach(p => { const [y, n] = p.receipt_no.split("-"); (byYear[y] = byYear[y] || []).push(+n); });
+    const gaps = [];
+    for (const [y, nums] of Object.entries(byYear)) {
+      const set = new Set(nums), max = Math.max(...nums), missing = [];
+      for (let i = 1; i <= max; i++) if (!set.has(i)) missing.push(i);
+      if (missing.length) gaps.push({ year: y, missing: missing.slice(0, 50) });
+    }
+    return { ok: true, checked: count, last_hash: prev, receipt_gaps: gaps };
+  }
+
+  // ------------------------------------------------------------ business
+  const allowed = u => u.role === "owner" ? S.properties.map(p => p.id) : S.user_properties.filter(x => x.user_id === u.id).map(x => x.property_id);
+  const checkProp = (u, pid) => { if (!allowed(u).includes(Number(pid))) throw new ApiError("K tomuto objektu nemáte přístup", 403); };
+  const need = (b, ...ks) => ks.forEach(k => { if (b[k] == null || b[k] === "") throw new ApiError("Chybí pole: " + k); });
+  const num = (v, name = "částka", positive = true) => {
+    const x = round(parseFloat(v));
+    if (isNaN(x)) throw new ApiError("Neplatná " + name);
+    if (positive && x <= 0) throw new ApiError(name[0].toUpperCase() + name.slice(1) + " musí být kladná");
+    return x;
+  };
+  const occupiedCount = uid => S.stays.filter(s => s.unit_id === uid && !s.checkout_date).length;
+
+  function stayExpected(st, upto) {
+    const start = parseD(st.start_date);
+    upto = upto || todayD();
+    const ended = st.checkout_date && parseD(st.checkout_date) <= upto;
+    let end = st.checkout_date ? parseD(st.checkout_date) : upto;
+    if (end > upto) end = upto;
+    if (end < start) return [0, 0];
+    if (st.rate_type === "night") {
+      const n = ended ? Math.max(1, days(start, end)) : days(start, end) + 1;
+      return [round(n * st.rate), n];
+    }
+    const limit = ended ? end : addDays(end, 1);
+    let k = 0;
+    while (addMonths(start, k) < limit) k++;
+    k = Math.max(k, 1);
+    return [round(k * st.rate), k];
+  }
+  const refKind = p => p.kind === "storno" ? get("payments", p.ref_payment_id)?.kind : p.kind;
+  const stayPaid = id => round(S.payments.filter(p => p.stay_id === id && refKind(p) === "rent").reduce((a, p) => a + p.amount, 0));
+  const depositHeld = id => round(S.payments.filter(p => p.stay_id === id && ["deposit", "deposit_refund"].includes(refKind(p))).reduce((a, p) => a + p.amount, 0));
+  function stayRow(s) {
+    const p = get("persons", s.person_id), u = get("units", s.unit_id), pr = get("properties", u.property_id);
+    return { ...s, person_name: p.name, person_phone: p.phone, unit_name: u.name, property_id: u.property_id, property_name: pr.name, property_type: pr.type };
+  }
+  function enrich(s) {
+    const st = stayRow(s);
+    const [exp, n] = stayExpected(st);
+    st.expected = exp; st.periods = n; st.paid = stayPaid(st.id);
+    st.balance = round(exp - st.paid); st.deposit_held = depositHeld(st.id); st.active = !st.checkout_date;
+    return st;
+  }
+  function nextReceipt() {
+    const y = todayD().getUTCFullYear();
+    const nums = S.payments.filter(p => p.receipt_no.startsWith(y + "-")).map(p => +p.receipt_no.split("-")[1]);
+    return `${y}-${String((nums.length ? Math.max(...nums) : 0) + 1).padStart(6, "0")}`;
+  }
+  function insertPayment(user, kind, pid, amount, method, stayId = null, personId = null, note = "", ref = null, pdate = null) {
+    const p = insert("payments", { receipt_no: nextReceipt(), kind, property_id: Number(pid), stay_id: stayId, person_id: personId,
+      date: pdate || iso(todayD()), amount, method, note, ref_payment_id: ref, created_by: user.id, created_at: S._ts || nowIso() });
+    audit(user, "payment_" + kind, "payment", p.id, { receipt: p.receipt_no, amount, method, stay: stayId, note, ref });
+    return { ...p };
+  }
+  function cashState(pid) {
+    const sum = a => a.reduce((x, r) => x + r.amount, 0);
+    const inc = sum(S.payments.filter(p => p.property_id === pid && p.method === "cash"));
+    const exp = sum(S.expenses.filter(e => e.property_id === pid && e.method === "cash" && e.status === "approved"));
+    const pend = sum(S.expenses.filter(e => e.property_id === pid && e.method === "cash" && e.status === "pending"));
+    const tr = sum(S.cash_transfers.filter(t => t.property_id === pid));
+    const closings = S.cash_closings.filter(c => c.property_id === pid);
+    const diffs = closings.reduce((a, c) => a + c.difference, 0);
+    return { property_id: pid, income_cash: round(inc), expenses_cash: round(exp), pending_cash_expenses: round(pend), transfers: round(tr),
+      differences_total: round(diffs), expected: round(inc - exp - tr + diffs), last_closing: closings[closings.length - 1] || null };
+  }
+  function requestApproval(user, type, payload, summary) {
+    const a = insert("approvals", { type, payload, summary, status: "pending", requested_by: user.id, requested_at: S._ts || nowIso(),
+      decided_by: null, decided_at: null, decision_note: "" });
+    audit(user, "approval_request", "approval", a.id, { type, summary, ...payload });
+    return a.id;
+  }
+  function executeApproval(a, owner) {
+    const p = a.payload;
+    if (a.type === "payment_storno") {
+      const o = get("payments", p.payment_id);
+      if (S.payments.some(x => x.ref_payment_id === o.id && x.kind === "storno")) throw new ApiError("Platba už byla stornována");
+      insertPayment(owner, "storno", o.property_id, -o.amount, o.method, o.stay_id, o.person_id, `Storno dokladu ${o.receipt_no}: ${p.reason}`, o.id);
+    } else if (a.type === "deposit_refund") {
+      const st = stayRow(get("stays", p.stay_id));
+      const held = depositHeld(st.id);
+      if (p.amount > held + 0.001) throw new ApiError(`Na kauci je jen ${held} Kč`);
+      insertPayment(owner, "deposit_refund", st.property_id, -p.amount, p.method, st.id, st.person_id, "Vrácení kauce: " + (p.reason || ""));
+    } else if (a.type === "expense") {
+      const e = get("expenses", p.expense_id);
+      if (e.method === "cash" && e.amount > cashState(e.property_id).expected + 0.001)
+        throw new ApiError("V pokladně podle evidence není na tento hotovostní výdaj dost peněz – zamítněte ho nebo nejdřív zkontrolujte pokladnu");
+      e.status = "approved";
+    } else if (a.type === "rate_discount") {
+      get("stays", p.stay_id).rate = p.rate;
+    }
+  }
+
+  // ------------------------------------------------------------ routes
+  const R = [];
+  const route = (m, pat, fn, opt = {}) => R.push({ m, parts: pat.split("/").filter(Boolean), fn, owner: !!opt.owner, auth: opt.auth !== false });
+  const userName = id => get("users", id)?.name || "";
+  const propName = id => get("properties", id)?.name || "";
+  const byIdDesc = (a, b) => b.id - a.id;
+
+  route("POST", "/api/login", (u, b) => {
+    const usr = S.users.find(x => x.username === b.username && x.active);
+    if (!usr || usr.password !== b.password) throw new ApiError("Špatné jméno nebo heslo", 401);
+    const tok = "t" + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    S.sessions[tok] = usr.id;
+    audit(usr, "login");
+    return { token: tok };
+  }, { auth: false });
+  route("POST", "/api/logout", u => { audit(u, "logout"); return { ok: true }; });
+  route("GET", "/api/me", u => ({ id: u.id, username: u.username, name: u.name, role: u.role, must_change_pw: 0, properties: allowed(u) }));
+  route("POST", "/api/me/password", (u, b) => {
+    need(b, "old", "new");
+    if (b.old !== u.password) throw new ApiError("Staré heslo nesouhlasí");
+    if (b.new.length < 8) throw new ApiError("Heslo musí mít aspoň 8 znaků");
+    u.password = b.new; audit(u, "password_change", "user", u.id); return { ok: true };
+  });
+
+  route("GET", "/api/users", () => S.users.map(x => ({ id: x.id, username: x.username, name: x.name, role: x.role, active: x.active,
+    properties: S.user_properties.filter(p => p.user_id === x.id).map(p => p.property_id) })), { owner: true });
+  route("POST", "/api/users", (u, b) => {
+    need(b, "username", "name", "password", "role");
+    if (b.password.length < 8) throw new ApiError("Heslo musí mít aspoň 8 znaků");
+    if (S.users.some(x => x.username === b.username)) throw new ApiError("Uživatel už existuje");
+    const n = insert("users", { username: b.username, name: b.name, role: b.role, password: b.password, active: 1 });
+    (b.properties || []).forEach(pid => S.user_properties.push({ user_id: n.id, property_id: Number(pid) }));
+    audit(u, "user_create", "user", n.id, { username: b.username, role: b.role, properties: b.properties || [] });
+    return { id: n.id };
+  }, { owner: true });
+  route("PUT", "/api/users/:id", (u, b, q, id) => {
+    const x = get("users", id); if (!x) throw new ApiError("Nenalezeno", 404);
+    if ("active" in b) { if (x.id === u.id && !b.active) throw new ApiError("Nemůžete zablokovat sami sebe"); x.active = b.active ? 1 : 0; }
+    if ("properties" in b) { S.user_properties = S.user_properties.filter(p => p.user_id !== x.id); b.properties.forEach(pid => S.user_properties.push({ user_id: x.id, property_id: Number(pid) })); }
+    if (b.password) { if (b.password.length < 8) throw new ApiError("Heslo musí mít aspoň 8 znaků"); x.password = b.password; b = { ...b, password: "***" }; }
+    audit(u, "user_update", "user", x.id, b); return { ok: true };
+  }, { owner: true });
+
+  route("GET", "/api/settings", () => ({ ...S.settings }));
+  route("PUT", "/api/settings", (u, b) => {
+    for (const [k, v] of Object.entries(b)) if (k in S.settings) {
+      const old = S.settings[k]; S.settings[k] = String(num(v, k, false)); audit(u, "setting_change", null, null, { key: k, old, new: v });
+    }
+    return { ok: true };
+  }, { owner: true });
+
+  function properties(u) {
+    const active = S.stays.filter(s => !s.checkout_date).map(enrich);
+    return S.properties.filter(p => allowed(u).includes(p.id)).map(p => {
+      let beds = 0, occ = 0;
+      const units = S.units.filter(x => x.property_id === p.id).sort((a, b) => a.name.localeCompare(b.name)).map(x => {
+        const stays = active.filter(s => s.unit_id === x.id);
+        const un = { ...x, stays, occupied: stays.length, debt: round(stays.reduce((a, s) => a + Math.max(0, s.balance), 0)) };
+        if (!un.maintenance) { beds += un.capacity; occ += Math.min(un.occupied, un.capacity); }
+        return un;
+      });
+      return { ...p, units, capacity: beds, occupied: occ };
+    });
+  }
+  route("GET", "/api/properties", u => properties(u));
+  route("POST", "/api/properties", (u, b) => { need(b, "name", "type"); const p = insert("properties", { name: b.name, type: b.type, address: b.address || "" }); audit(u, "property_create", "property", p.id, b); return { id: p.id }; }, { owner: true });
+  route("POST", "/api/units", (u, b) => {
+    need(b, "property_id", "name", "kind");
+    const x = insert("units", { property_id: Number(b.property_id), name: b.name, kind: b.kind, capacity: parseInt(b.capacity || 1), price_night: num(b.price_night || 0, "cena", false), price_month: num(b.price_month || 0, "cena", false), maintenance: 0, note: b.note || "" });
+    audit(u, "unit_create", "unit", x.id, b); return { id: x.id };
+  }, { owner: true });
+  route("PUT", "/api/units/:id", (u, b, q, id) => {
+    const un = get("units", id); if (!un) throw new ApiError("Nenalezeno", 404);
+    checkProp(u, un.property_id);
+    const ownerF = ["name", "kind", "capacity", "price_night", "price_month"];
+    if (u.role !== "owner" && ownerF.some(f => f in b && b[f] != un[f])) throw new ApiError("Ceny, kapacitu a názvy může měnit jen majitel", 403);
+    const ch = {};
+    ["maintenance", "note", ...ownerF].forEach(f => { if (f in b && b[f] != un[f]) { ch[f] = { old: un[f], new: b[f] }; un[f] = b[f]; } });
+    audit(u, "unit_update", "unit", un.id, ch); return { ok: true };
+  });
+
+  route("GET", "/api/persons", (u, b, q) => {
+    const t = (q.q || "").toLowerCase();
+    return S.persons.filter(p => [p.name, p.id_doc, p.phone].some(x => (x || "").toLowerCase().includes(t))).sort((a, b) => a.name.localeCompare(b.name, "cs")).slice(0, 200);
+  });
+  route("POST", "/api/persons", (u, b) => {
+    need(b, "name");
+    const p = insert("persons", { name: b.name, id_doc: b.id_doc || "", birth: b.birth || "", phone: b.phone || "", email: b.email || "", note: b.note || "", created_at: S._ts || nowIso() });
+    audit(u, "person_create", "person", p.id, { name: b.name }); return { id: p.id };
+  });
+  route("PUT", "/api/persons/:id", (u, b, q, id) => {
+    const p = get("persons", id); if (!p) throw new ApiError("Nenalezeno", 404);
+    const ch = {};
+    ["name", "id_doc", "birth", "phone", "email", "note"].forEach(f => { if (f in b && b[f] !== p[f]) { ch[f] = { old: p[f], new: b[f] }; p[f] = b[f]; } });
+    audit(u, "person_update", "person", p.id, ch); return { ok: true };
+  });
+  route("GET", "/api/persons/:id", (u, b, q, id) => {
+    const p = get("persons", id); if (!p) throw new ApiError("Nenalezeno", 404);
+    const ids = allowed(u);
+    return { ...p,
+      stays: S.stays.filter(s => s.person_id === p.id).map(enrich).filter(s => ids.includes(s.property_id)).sort((a, b) => b.start_date.localeCompare(a.start_date)),
+      payments: S.payments.filter(x => x.person_id === p.id && ids.includes(x.property_id)).sort(byIdDesc),
+      belongings: S.belongings.filter(x => x.person_id === p.id).sort(byIdDesc) };
+  });
+
+  function stays(u, q) {
+    const ids = allowed(u), status = q.status || "active";
+    return S.stays.map(enrich).filter(s => ids.includes(s.property_id) &&
+      (status === "active" ? !s.checkout_date : status === "ended" ? !!s.checkout_date : true))
+      .sort((a, b) => (!!a.checkout_date - !!b.checkout_date) || b.start_date.localeCompare(a.start_date)).slice(0, 500);
+  }
+  route("GET", "/api/stays", (u, b, q) => stays(u, q));
+  route("POST", "/api/stays", (u, b) => {
+    need(b, "unit_id", "person_id", "start_date", "rate_type");
+    const un = get("units", b.unit_id); if (!un) throw new ApiError("Pokoj neexistuje");
+    checkProp(u, un.property_id);
+    if (un.maintenance) throw new ApiError("Pokoj je v údržbě");
+    if (occupiedCount(un.id) >= un.capacity) throw new ApiError("Pokoj je plně obsazen");
+    if (S.stays.some(s => s.person_id === Number(b.person_id) && !s.checkout_date)) throw new ApiError("Osoba už má aktivní pobyt – nejdřív ji odhlaste");
+    const list = b.rate_type === "night" ? un.price_night : un.price_month;
+    const rate = num(b.rate ?? list, "cena");
+    const deposit = num(b.deposit || 0, "kauce", false);
+    const needsOk = !!list && u.role !== "owner" && rate < list * (1 - setting("rate_tolerance_pct") / 100);
+    const st = insert("stays", { unit_id: un.id, person_id: Number(b.person_id), start_date: b.start_date, planned_end: b.planned_end || null, checkout_date: null,
+      rate_type: b.rate_type, rate: needsOk ? list : rate, deposit, note: b.note || "", created_by: u.id, created_at: S._ts || nowIso() });
+    audit(u, "checkin", "stay", st.id, { unit: un.name, person: Number(b.person_id), rate, list_price: list, rate_type: b.rate_type });
+    let msg = "Ubytováno.";
+    if (needsOk) {
+      requestApproval(u, "rate_discount", { stay_id: st.id, rate, list_price: list }, `Sleva pro pobyt #${st.id} (${un.name}): ${rate} Kč místo ceníkových ${list} Kč`);
+      msg += ` Sleva pod ceník šla ke schválení majiteli – do té doby platí ceník ${list} Kč.`;
+    }
+    return { id: st.id, message: msg };
+  });
+  route("POST", "/api/stays/:id/checkout", (u, b, q, id) => {
+    const s = get("stays", id); if (!s || s.checkout_date) throw new ApiError("Pobyt není aktivní");
+    checkProp(u, stayRow(s).property_id);
+    const d = b.date || iso(todayD());
+    if (parseD(d) < parseD(s.start_date)) throw new ApiError("Datum odhlášení je před začátkem pobytu");
+    s.checkout_date = d;
+    const st = enrich(s);
+    audit(u, "checkout", "stay", s.id, { date: d, balance: st.balance, deposit_held: st.deposit_held, room_check: b.room_check || "" });
+    return st;
+  });
+  route("POST", "/api/stays/:id/rate", (u, b, q, id) => {
+    const s = get("stays", id); if (!s) throw new ApiError("Nenalezeno", 404);
+    const st = stayRow(s); checkProp(u, st.property_id);
+    const rate = num(b.rate, "cena");
+    if (u.role === "owner") { audit(u, "rate_change", "stay", s.id, { old: s.rate, new: rate }); s.rate = rate; return { message: "Cena změněna." }; }
+    requestApproval(u, "rate_discount", { stay_id: s.id, rate, list_price: s.rate }, `Změna ceny pobytu #${s.id} (${st.unit_name}, ${st.person_name}): ${s.rate} → ${rate} Kč`);
+    return { message: "Změna ceny odeslána ke schválení majiteli." };
+  });
+  route("POST", "/api/stays/:id/deposit_refund", (u, b, q, id) => {
+    const st = stayRow(get("stays", id)); checkProp(u, st.property_id);
+    const amount = num(b.amount);
+    if (amount > depositHeld(st.id) + 0.001) throw new ApiError("Částka je vyšší než složená kauce");
+    requestApproval(u, "deposit_refund", { stay_id: st.id, amount, method: b.method || "cash", reason: b.reason || "" }, `Vrácení kauce ${amount} Kč – ${st.person_name} (${st.unit_name})`);
+    return { message: "Žádost o vrácení kauce odeslána majiteli." };
+  });
+
+  route("GET", "/api/payments", (u, b, q) => {
+    const ids = allowed(u), from = q.from || "0000", to = q.to || "9999";
+    return S.payments.filter(p => ids.includes(p.property_id) && p.date >= from && p.date <= to).sort(byIdDesc).slice(0, 1000).map(p => ({
+      ...p, person_name: get("persons", p.person_id)?.name || null, created_by_name: userName(p.created_by), property_name: propName(p.property_id),
+      storno_receipt: S.payments.find(x => x.ref_payment_id === p.id && x.kind === "storno")?.receipt_no || null }));
+  });
+  route("POST", "/api/payments", (u, b) => {
+    need(b, "amount", "method", "kind");
+    if (!["rent", "deposit", "other"].includes(b.kind)) throw new ApiError("Neplatný druh platby");
+    const amount = num(b.amount);
+    let pid, personId = b.person_id || null, stayId = b.stay_id ? Number(b.stay_id) : null;
+    if (stayId) { const st = get("stays", stayId); if (!st) throw new ApiError("Pobyt neexistuje"); const r = stayRow(st); pid = r.property_id; personId = r.person_id; }
+    else { need(b, "property_id"); if (b.kind !== "other") throw new ApiError("Platba nájmu/kauce musí být k pobytu"); pid = Number(b.property_id); }
+    checkProp(u, pid);
+    return insertPayment(u, b.kind, pid, amount, b.method, stayId, personId, b.note || "", null, b._date);
+  });
+  route("POST", "/api/payments/:id/storno", (u, b, q, id) => {
+    need(b, "reason");
+    const p = get("payments", id);
+    if (!p || ["storno", "deposit_refund"].includes(p.kind)) throw new ApiError("Tuto platbu nelze stornovat");
+    checkProp(u, p.property_id);
+    if (S.payments.some(x => x.ref_payment_id === p.id && x.kind === "storno") || S.approvals.some(a => a.type === "payment_storno" && a.status === "pending" && a.payload.payment_id === p.id))
+      throw new ApiError("Storno už existuje nebo čeká na schválení");
+    const aid = requestApproval(u, "payment_storno", { payment_id: p.id, reason: b.reason }, `Storno dokladu ${p.receipt_no} na ${p.amount} Kč – důvod: ${b.reason}`);
+    if (u.role === "owner") { decide(u, { approve: true, note: "Storno provedl majitel" }, {}, aid); return { message: "Stornováno." }; }
+    return { message: "Storno odesláno ke schválení majiteli." };
+  });
+
+  route("GET", "/api/expenses", u => {
+    const ids = allowed(u);
+    return S.expenses.filter(e => ids.includes(e.property_id)).sort(byIdDesc).map(e => ({ ...e, created_by_name: userName(e.created_by), property_name: propName(e.property_id) }));
+  });
+  route("POST", "/api/expenses", (u, b) => {
+    need(b, "property_id", "amount", "category", "description", "method");
+    checkProp(u, b.property_id);
+    const amount = num(b.amount), limit = setting("expense_limit");
+    const status = u.role === "owner" || amount <= limit ? "approved" : "pending";
+    if (b.method === "cash" && status === "approved" && u.role !== "owner" && amount > cashState(Number(b.property_id)).expected)
+      throw new ApiError("V pokladně podle evidence není tolik hotovosti");
+    const e = insert("expenses", { property_id: Number(b.property_id), date: b.date || iso(todayD()), amount, category: b.category, description: b.description,
+      method: b.method, supplier: b.supplier || "", doc_no: b.doc_no || "", status, created_by: u.id, created_at: S._ts || nowIso() });
+    audit(u, "expense_create", "expense", e.id, { amount, category: b.category, description: b.description, method: b.method, status, doc_no: b.doc_no || "" });
+    if (status === "pending") { requestApproval(u, "expense", { expense_id: e.id }, `Výdaj ${amount} Kč – ${b.category}: ${b.description}`); return { id: e.id, message: `Výdaj nad ${limit} Kč čeká na schválení majitelem.` }; }
+    return { id: e.id, message: "Výdaj zapsán." };
+  });
+
+  route("GET", "/api/cash", u => allowed(u).map(pid => ({ ...cashState(pid), property_name: propName(pid),
+    closings: S.cash_closings.filter(c => c.property_id === pid).sort(byIdDesc).slice(0, 30).map(c => ({ ...c, user_name: userName(c.created_by) })),
+    transfers_list: S.cash_transfers.filter(t => t.property_id === pid).sort(byIdDesc).slice(0, 30).map(t => ({ ...t, user_name: userName(t.created_by) })) })));
+  route("POST", "/api/cash/closing", (u, b) => {
+    need(b, "property_id", "counted");
+    const pid = Number(b.property_id); checkProp(u, pid);
+    const counted = num(b.counted, "částka", false), cs = cashState(pid), diff = round(counted - cs.expected);
+    if (Math.abs(diff) > setting("cash_tolerance") && !b.note) throw new ApiError(`Rozdíl ${diff} Kč je nad tolerancí – napište vysvětlení do poznámky`);
+    const c = insert("cash_closings", { property_id: pid, expected: cs.expected, counted, difference: diff, note: b.note || "", created_by: u.id, created_at: S._ts || nowIso() });
+    audit(u, "cash_closing", "cash_closing", c.id, { property: pid, expected: cs.expected, counted, difference: diff });
+    return { expected: cs.expected, counted, difference: diff };
+  });
+  route("POST", "/api/cash/transfer", (u, b) => {
+    need(b, "property_id", "amount", "received_by");
+    const pid = Number(b.property_id); checkProp(u, pid);
+    const amount = num(b.amount);
+    if (amount > cashState(pid).expected + 0.001) throw new ApiError("V pokladně podle evidence není tolik hotovosti");
+    const t = insert("cash_transfers", { property_id: pid, date: iso(todayD()), amount, received_by: b.received_by, note: b.note || "", created_by: u.id, created_at: S._ts || nowIso() });
+    audit(u, "cash_transfer", "cash_transfer", t.id, { property: pid, amount, received_by: b.received_by });
+    return { ok: true };
+  });
+
+  route("GET", "/api/approvals", u => S.approvals.filter(a => u.role === "owner" || a.requested_by === u.id)
+    .sort((a, b) => ((a.status !== "pending") - (b.status !== "pending")) || b.id - a.id)
+    .map(a => ({ ...a, requested_by_name: userName(a.requested_by), decided_by_name: a.decided_by ? userName(a.decided_by) : null })));
+  function decide(u, b, q, id) {
+    const a = get("approvals", id);
+    if (!a || a.status !== "pending") throw new ApiError("Žádost už byla vyřízena");
+    const ok = !!b.approve;
+    if (ok) executeApproval(a, u);
+    else if (a.type === "expense") get("expenses", a.payload.expense_id).status = "rejected";
+    Object.assign(a, { status: ok ? "approved" : "rejected", decided_by: u.id, decided_at: S._ts || nowIso(), decision_note: b.note || "" });
+    audit(u, "approval_" + a.status, "approval", a.id, { type: a.type, summary: a.summary });
+    return { ok: true };
+  }
+  route("POST", "/api/approvals/:id/decide", decide, { owner: true });
+
+  route("GET", "/api/belongings", () => S.belongings.slice().sort((a, b) => (!!a.returned_at - !!b.returned_at) || b.id - a.id).map(x => ({
+    ...x, person_name: get("persons", x.person_id)?.name || null, unit_name: get("units", x.unit_id)?.name || null,
+    received_by_name: userName(x.received_by), returned_by_name: x.returned_by ? userName(x.returned_by) : null })));
+  route("POST", "/api/belongings", (u, b) => {
+    need(b, "description", "reason", "witness");
+    const x = insert("belongings", { person_id: b.person_id ? Number(b.person_id) : null, unit_id: b.unit_id ? Number(b.unit_id) : null, description: b.description,
+      reason: b.reason, witness: b.witness, received_by: u.id, received_at: S._ts || nowIso(), returned_to: null, returned_by: null, returned_at: null, return_witness: null });
+    audit(u, "belonging_receive", "belonging", x.id, b); return { id: x.id };
+  });
+  route("POST", "/api/belongings/:id/return", (u, b, q, id) => {
+    need(b, "returned_to", "witness");
+    const x = get("belongings", id); if (!x || x.returned_at) throw new ApiError("Věc už byla vydána");
+    Object.assign(x, { returned_to: b.returned_to, returned_by: u.id, returned_at: nowIso(), return_witness: b.witness });
+    audit(u, "belonging_return", "belonging", x.id, b); return { ok: true };
+  });
+
+  route("GET", "/api/entries", u => {
+    const ids = allowed(u);
+    return S.room_entries.map(e => { const un = get("units", e.unit_id); return { ...e, unit_name: un.name, property_id: un.property_id, property_name: propName(un.property_id), user_name: userName(e.user_id) }; })
+      .filter(e => ids.includes(e.property_id)).sort(byIdDesc);
+  });
+  route("POST", "/api/entries", (u, b) => {
+    need(b, "unit_id", "reason");
+    const un = get("units", b.unit_id); checkProp(u, un.property_id);
+    if (occupiedCount(un.id) && !b.tenant_present && !b.witness) throw new ApiError("Do obsazeného pokoje bez přítomnosti nájemníka jen se svědkem");
+    const e = insert("room_entries", { unit_id: un.id, user_id: u.id, entered_at: b.entered_at || nowIso(), reason: b.reason, witness: b.witness || "",
+      tenant_present: b.tenant_present ? 1 : 0, tenant_notified: b.tenant_notified ? 1 : 0, note: b.note || "" });
+    audit(u, "room_entry", "unit", un.id, b); return { id: e.id };
+  });
+
+  function monthReport(ids, ym) {
+    const [y, m] = ym.split("-").map(Number);
+    const start = new Date(Date.UTC(y, m - 1, 1)), end = addDays(addMonths(start, 1), -1);
+    const s0 = iso(start), s1 = iso(end), td = todayD();
+    return ids.map(pid => {
+      let expected = 0;
+      S.stays.map(stayRow).filter(st => st.property_id === pid && st.start_date <= s1 && (!st.checkout_date || st.checkout_date >= s0)).forEach(st => {
+        const upto = end < td ? end : td;
+        if (upto < start) return;
+        const a = stayExpected(st, upto)[0];
+        const bb = parseD(st.start_date) < start ? stayExpected(st, addDays(start, -1))[0] : 0;
+        expected += a - bb;
+      });
+      const inM = S.payments.filter(p => p.property_id === pid && p.date >= s0 && p.date <= s1);
+      const paid = inM.filter(p => refKind(p) === "rent").reduce((a, p) => a + p.amount, 0);
+      const other = inM.filter(p => refKind(p) === "other").reduce((a, p) => a + p.amount, 0);
+      const ex = S.expenses.filter(e => e.property_id === pid && e.status === "approved" && e.date >= s0 && e.date <= s1);
+      const cats = {};
+      ex.forEach(e => cats[e.category] = (cats[e.category] || 0) + e.amount);
+      const exp = ex.reduce((a, e) => a + e.amount, 0);
+      return { property_id: pid, property_name: propName(pid), expected: round(expected), paid_rent: round(paid), other_income: round(other), expenses: round(exp),
+        profit: round(paid + other - exp), expenses_by_category: Object.entries(cats).map(([category, s]) => ({ category, s })) };
+    });
+  }
+  route("GET", "/api/report", (u, b, q) => { const ym = q.month || iso(todayD()).slice(0, 7); return { month: ym, rows: monthReport(allowed(u), ym) }; });
+  route("GET", "/api/dashboard", u => {
+    const ids = allowed(u), props = properties(u);
+    const debts = stays(u, { status: "all" }).filter(s => s.balance > 0.5).sort((a, b) => b.balance - a.balance);
+    const cash = ids.map(pid => ({ ...cashState(pid), property_name: propName(pid) }));
+    const alerts = [];
+    const dayAgo = Date.now() - 864e5;
+    cash.forEach(c => {
+      const last = c.last_closing;
+      const moved = S.payments.some(p => p.property_id === c.property_id && p.method === "cash" && p.created_at > (last ? last.created_at : ""));
+      if (moved && (!last || new Date(last.created_at).getTime() < dayAgo)) alerts.push({ level: "warn", text: `${c.property_name}: pokladna nebyla uzavřena přes 24 h` });
+      if (last && Math.abs(last.difference) > setting("cash_tolerance")) alerts.push({ level: "bad", text: `${c.property_name}: poslední uzávěrka s rozdílem ${last.difference} Kč` });
+    });
+    const pend = u.role === "owner" ? S.approvals.filter(a => a.status === "pending").length : 0;
+    if (pend) alerts.push({ level: "warn", text: `${pend} žádostí čeká na vaše schválení` });
+    const since = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 19);
+    const stornos = S.payments.filter(p => p.kind === "storno" && p.created_at >= since && ids.includes(p.property_id)).length;
+    if (stornos >= 3) alerts.push({ level: "bad", text: `${stornos} storen plateb za posledních 7 dní – zkontrolujte` });
+    const ent = S.room_entries.filter(e => e.entered_at >= since && !e.tenant_present && ids.includes(get("units", e.unit_id).property_id)).length;
+    if (ent) alerts.push({ level: "info", text: `${ent}× vstup do pokoje bez přítomnosti nájemníka za 7 dní` });
+    return {
+      properties: props.map(p => ({ id: p.id, name: p.name, type: p.type, capacity: p.capacity, occupied: p.occupied })),
+      debt_total: round(debts.reduce((a, s) => a + s.balance, 0)), debts: debts.slice(0, 15),
+      overdue_count: debts.filter(s => s.active && s.rate_type === "month" && s.balance >= s.rate).length,
+      cash, alerts, month: monthReport(ids, iso(todayD()).slice(0, 7)),
+      deposits_held: round(S.payments.filter(p => ids.includes(p.property_id) && ["deposit", "deposit_refund"].includes(refKind(p))).reduce((a, p) => a + p.amount, 0)),
+    };
+  });
+
+  route("GET", "/api/audit", (u, b, q) => {
+    const t = (q.q || "").toLowerCase(), lim = Math.min(+(q.limit || 300), 5000);
+    return S.audit.filter(r => !t || [r.action, r.username, r.details].some(x => (x || "").toLowerCase().includes(t))).slice().reverse().slice(0, lim);
+  }, { owner: true });
+  route("GET", "/api/audit/verify", u => { const r = verifyAudit(); audit(u, "audit_verify", null, null, { ok: r.ok, checked: r.checked }); return r; }, { owner: true });
+  route("GET", "/api/backup", () => { throw new ApiError("Zálohy dělá plná verze programu (server.py). Webová ukázka ukládá data jen do vašeho prohlížeče."); }, { owner: true });
+  // jen pro ukázku: simulace podvodníka, který přepíše databázi mimo program
+  route("POST", "/api/demo/tamper", () => {
+    const victim = S.audit.find(r => r.action.startsWith("payment_rent"));
+    if (!victim) throw new ApiError("Zatím tu není žádná platba k podvržení");
+    victim.details = victim.details.replace(/"amount":\s*[\d.]+/, '"amount":100');
+    S.payments.find(p => p.id === victim.entity_id).amount = 100;
+    return { message: `Simulováno: někdo přímo v databázi snížil platbu (záznam #${victim.id}) na 100 Kč. Teď klikněte na „Ověřit neporušenost“.` };
+  }, { owner: true });
+  route("POST", "/api/demo/reset", () => { S = buildSeed(); return { ok: true }; }, { auth: false });
+
+  // ------------------------------------------------------------ dispatcher
+  function handle(path, method, body, token) {
+    const [p, qs] = path.split("?");
+    const q = Object.fromEntries(new URLSearchParams(qs || ""));
+    const parts = p.split("/").filter(Boolean);
+    for (const r of R) {
+      if (r.m !== method || r.parts.length !== parts.length) continue;
+      let ok = true, id;
+      r.parts.forEach((a, i) => { if (a.startsWith(":")) { if (!/^\d+$/.test(parts[i])) ok = false; else id = +parts[i]; } else if (a !== parts[i]) ok = false; });
+      if (!ok) continue;
+      const snapshot = JSON.stringify(S);
+      try {
+        const user = get("users", S.sessions[token]);
+        if (r.auth && !(user && user.active)) throw new ApiError("Nepřihlášen", 401);
+        if (r.owner && user.role !== "owner") throw new ApiError("Jen pro majitele", 403);
+        const data = JSON.parse(JSON.stringify(r.fn(user, body || {}, q, id) ?? null));
+        if (method !== "GET" || path.startsWith("/api/audit/verify")) save();
+        return { status: 200, data };
+      } catch (e) {
+        S = JSON.parse(snapshot);
+        if (e instanceof ApiError) {
+          if (e.code === 401 && r.parts[1] === "login") { audit(null, "login_failed", null, null, { username: (body || {}).username || "" }); save(); }
+          return { status: e.code, data: { error: e.message } };
+        }
+        console.error(e);
+        return { status: 500, data: { error: "Interní chyba: " + e.message } };
+      }
+    }
+    return { status: 404, data: { error: "Neznámá adresa" } };
+  }
+
+  // ------------------------------------------------------------ demo data
+  function buildSeed() {
+    S = fresh();
+    const td = todayD(), D = k => iso(addDays(td, k));
+    const at = (k, h = 10) => { S._ts = `${D(k)}T${pad(h)}:${pad((k * 7 + 60) % 60)}:00`; };
+    at(-75, 8);
+    const owner = insert("users", { username: "majitel", name: "Majitel", role: "owner", password: "majitel", active: 1 });
+    audit(null, "system_init", null, null, { msg: "Vytvořen účet majitel" });
+    const P = (name, type) => insert("properties", { name, type, address: "" }).id;
+    const hostel = P("Ubytovna", "hostel"), hotel = P("Hotel", "hotel"), flats = P("Byty", "apartments");
+    const U = (pid, name, kind, cap, n, m) => insert("units", { property_id: pid, name, kind, capacity: cap, price_night: n, price_month: m, maintenance: 0, note: "" });
+    for (let i = 1; i <= 20; i++) U(hostel, "U" + pad(i), "single", 1, 350, 6500);
+    for (let i = 21; i <= 50; i++) U(hostel, "U" + pad(i), "double", 2, 280, 5000);
+    for (let i = 1; i <= 6; i++) U(hotel, "H" + i, "room", 2, 1490, 0);
+    for (let i = 1; i <= 45; i++) U(flats, "B" + pad(i), "apartment", 1, 0, 12000);
+    audit(null, "seed", null, null, { msg: "Založeny objekty: Ubytovna 50 pokojů, Hotel 6 pokojů, Byty 45" });
+    const call = (u, m, path, body) => { const r = handle(path, m, body, tokFor(u)); if (r.status !== 200) throw new Error(path + ": " + r.data.error); return r.data; };
+    const toks = {};
+    const tokFor = u => { if (!toks[u.id]) { toks[u.id] = "seed" + u.id; S.sessions[toks[u.id]] = u.id; } return toks[u.id]; };
+    at(-74, 9);
+    call(owner, "POST", "/api/users", { username: "spravce", name: "Pepa Správce", password: "spravce12", role: "manager", properties: [hostel, flats] });
+    const mgr = S.users[1]; mgr.password = "spravce";
+    const unitBy = n => S.units.find(x => x.name === n).id;
+    const names = ["Jan Novák", "Petr Svoboda", "Marek Dvořák", "Oleksandr Kovalenko", "Tomáš Černý", "Lukáš Procházka", "Ivan Melnyk", "Jiří Kučera",
+      "Andrea Veselá", "Martin Horák", "Pavel Němec", "Kateřina Marková", "Radek Pokorný", "Viktor Bondar", "Eva Králová", "Josef Růžička",
+      "Lenka Benešová", "Michal Fiala", "Simona Šťastná", "David Sedláček", "Roman Doležal", "Hana Zemanová"];
+    const persons = names.map((n, i) => { at(-72 + i, 9); return call(mgr, "POST", "/api/persons", { name: n, id_doc: (203000000 + i * 7919).toString(), phone: "+420 7" + (31000000 + i * 4471) }).id; });
+    let pi = 0;
+    const stay = (u, unit, start, rt, opts = {}) => { at(start, 11); const r = call(u, "POST", "/api/stays", { unit_id: unitBy(unit), person_id: persons[pi++], start_date: D(start), rate_type: rt, deposit: opts.deposit || 0, ...opts.body }); return r.id; };
+    const pay = (u, sid, amount, day, method = "cash", kind = "rent", note = "") => { at(day, 14); return call(u, "POST", "/api/payments", { kind, stay_id: sid, amount, method, note, _date: D(day) }); };
+    // Ubytovna – měsíční i noční
+    const s1 = stay(mgr, "U01", -60, "month"); pay(mgr, s1, 6500, -60); pay(mgr, s1, 6500, -30); pay(mgr, s1, 6500, 0);
+    const s2 = stay(mgr, "U02", -45, "month"); pay(mgr, s2, 6500, -45); pay(mgr, s2, 3000, -14);
+    const s3 = stay(mgr, "U05", -20, "night"); pay(mgr, s3, 350 * 14, -20);
+    const s4 = stay(mgr, "U21", -50, "month"); pay(mgr, s4, 5000, -50); pay(mgr, s4, 5000, -20, "bank");
+    const s5 = stay(mgr, "U21", -50, "month"); pay(mgr, s5, 5000, -50); pay(mgr, s5, 5000, -20);
+    const s6 = stay(mgr, "U22", -10, "night"); pay(mgr, s6, 280 * 7, -10);
+    const s7 = stay(mgr, "U23", -35, "month", { body: { rate: 4000 } }); pay(mgr, s7, 4000, -35); pay(mgr, s7, 4000, -5);
+    const s8 = stay(mgr, "U30", -3, "night"); pay(mgr, s8, 840, -3);
+    const s9 = stay(mgr, "U31", -25, "month"); pay(mgr, s9, 5000, -25);
+    const s10 = stay(mgr, "U12", -40, "month"); pay(mgr, s10, 6500, -40);
+    at(-8, 9); call(mgr, "POST", `/api/stays/${s10}/checkout`, { date: D(-8), room_check: "Pokoj v pořádku, vráceny 2 klíče" });
+    // Hotel – majitel
+    const h1 = stay(owner, "H2", -2, "night"); pay(owner, h1, 1490 * 2, -2, "card");
+    const h2 = stay(owner, "H4", -1, "night"); pay(owner, h2, 1490, -1, "card");
+    // Byty – kauce a nájem převodem
+    const b = [];
+    [["B01", -70], ["B02", -65], ["B03", -40], ["B07", -55], ["B12", -20], ["B15", -62]].forEach(([u, d], i) => {
+      const sid = stay(mgr, u, d, "month", { deposit: 24000 }); b.push(sid);
+      pay(mgr, sid, 24000, d, "bank", "deposit", "Kauce při podpisu smlouvy");
+      const months = Math.ceil(-d / 30.4) + (i === 2 ? -1 : 0);
+      for (let k = 0; k < months; k++) pay(mgr, sid, 12000, d + k * 30, "bank", "rent", "Nájem");
+    });
+    // výdaje
+    at(-30, 15); call(mgr, "POST", "/api/expenses", { property_id: hostel, date: D(-30), amount: 860, category: "Úklid a drogerie", description: "Čisticí prostředky, toaletní papír", method: "cash", supplier: "Makro", doc_no: "UC-4471" });
+    at(-18, 15); call(mgr, "POST", "/api/expenses", { property_id: hostel, date: D(-18), amount: 1450, category: "Opravy a údržba", description: "Výměna baterie ve sprše U21", method: "cash", supplier: "Hornbach", doc_no: "UC-8812" });
+    at(-12, 10); call(owner, "POST", "/api/expenses", { property_id: flats, date: D(-12), amount: 18500, category: "Opravy a údržba", description: "Oprava střechy nad B07", method: "bank", supplier: "Střechy Novotný s.r.o.", doc_no: "FV-2026-118" });
+    at(-2, 16); call(mgr, "POST", "/api/expenses", { property_id: hostel, date: D(-2), amount: 6900, category: "Vybavení", description: "Pračka do prádelny", method: "cash", supplier: "Datart", doc_no: "UC-9930" });
+    // pokladna
+    at(-15, 19); let cs = cashState(hostel); call(mgr, "POST", "/api/cash/closing", { property_id: hostel, counted: cs.expected });
+    at(-14, 9); call(mgr, "POST", "/api/cash/transfer", { property_id: hostel, amount: 20000, received_by: "Majitel – převzal osobně" });
+    at(-1, 19); cs = cashState(hostel); call(mgr, "POST", "/api/cash/closing", { property_id: hostel, counted: cs.expected - 500, note: "Nevím, kde je rozdíl – přepočítám zítra" });
+    // storno čekající na schválení
+    at(-1, 12); const lastPay = S.payments.filter(p => p.stay_id === s6)[0];
+    call(mgr, "POST", `/api/payments/${lastPay.id}/storno`, { reason: "Host prý platil omylem dvakrát" });
+    // úschova a vstupy
+    at(-8, 10); call(mgr, "POST", "/api/belongings", { person_id: persons[9], unit_id: unitBy("U12"), description: "Taška s oblečením, rychlovarná konvice, nabíječka Samsung", reason: "Věci zůstaly po odchodu nájemníka", witness: "Marie Uklízečka" });
+    at(-4, 10); call(mgr, "POST", "/api/belongings", { person_id: persons[3], unit_id: unitBy("U05"), description: "Obálka s hotovostí 4 200 Kč (spočítáno ve dvou), cestovní pas UA", reason: "Nájemník požádal o úschovu", witness: "Karel Údržbář" });
+    at(-6, 13); call(mgr, "POST", "/api/entries", { unit_id: unitBy("U21"), entered_at: `${D(-6)}T13:10`, reason: "Oprava / údržba", tenant_present: true, tenant_notified: true, note: "Výměna sprchové baterie" });
+    at(-3, 9); call(mgr, "POST", "/api/entries", { unit_id: unitBy("U02"), entered_at: `${D(-3)}T09:40`, reason: "Havárie (voda, požár…)", witness: "Karel Údržbář", tenant_notified: false, note: "Teklo do pokoje pod ním, zavřen ventil" });
+    delete S._ts; S.sessions = {};
+    return S;
+  }
+
+  try { S = JSON.parse(localStorage.getItem(KEY) || "null"); } catch { S = null; }
+  if (!S || !S.audit) { buildSeed(); save(); }
+  window.DEMO_API = handle;
+  window.DEMO_RESET = () => { buildSeed(); save(); };
+})();
+
+</script>
+<script>
+"use strict";
+// ---------------------------------------------------------------- utilities
+const $ = (s, el = document) => el.querySelector(s);
+const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const kc = n => (Number(n) || 0).toLocaleString("cs-CZ", { maximumFractionDigits: 2 }) + " Kč";
+const dt = s => s ? new Date(s.length <= 10 ? s + "T00:00" : s).toLocaleDateString("cs-CZ") : "";
+const dtt = s => s ? new Date(s).toLocaleString("cs-CZ", { dateStyle: "short", timeStyle: "short" }) : "";
+const todayIso = () => new Date().toISOString().slice(0, 10);
+const METHOD = { cash: "Hotově", bank: "Převodem", card: "Kartou" };
+const KIND = { rent: "Nájem/ubytování", deposit: "Kauce", deposit_refund: "Vrácení kauce", storno: "Storno", other: "Ostatní příjem" };
+const PTYPE = { hostel: "Ubytovna", hotel: "Hotel", apartments: "Byty" };
+const UKIND = { single: "1lůžkový", double: "2lůžkový", room: "Pokoj", apartment: "Byt" };
+const APPR = { payment_storno: "Storno platby", deposit_refund: "Vrácení kauce", expense: "Výdaj", rate_discount: "Sleva / změna ceny" };
+const EXP_CAT = ["Opravy a údržba", "Úklid a drogerie", "Energie", "Materiál", "Vybavení", "Služby", "Poplatky", "Ostatní"];
+
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+  del(k) { try { localStorage.removeItem(k); } catch {} },
+};
+let TOKEN = store.get("token") || "";
+let ME = null, PROPS = [], CACHE = {};
+
+async function api(path, opts = {}) {
+  if (window.DEMO_API) {  // webová ukázka: "server" běží přímo v prohlížeči
+    const r = window.DEMO_API(path, opts.method || (opts.body ? "POST" : "GET"), opts.body, TOKEN);
+    if (r.status === 401 && path !== "/api/login") { logoutLocal(); throw new Error(r.data.error); }
+    if (r.status !== 200) throw new Error(r.data.error || "Chyba");
+    return r.data;
+  }
+  const r = await fetch(path, {
+    method: opts.method || (opts.body ? "POST" : "GET"),
+    headers: { "Content-Type": "application/json", Authorization: "Bearer " + TOKEN },
+    body: opts.body ? JSON.stringify(opts.body) : undefined,
+  });
+  const data = await r.json().catch(() => ({ error: "Chybná odpověď serveru" }));
+  if (r.status === 401 && path !== "/api/login") { logoutLocal(); throw new Error(data.error); }
+  if (!r.ok) throw new Error(data.error || "Chyba");
+  return data;
+}
+function toast(msg, ms = 3500) { const t = $("#toast"); t.textContent = msg; t.classList.remove("hidden"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.add("hidden"), ms); }
+function closeModal() { $("#modal").classList.add("hidden"); }
+$("#modal").addEventListener("click", e => { if (e.target.id === "modal") closeModal(); });
+
+/** Otevře formulář v modálním okně. fields: [{n,l,t,opts,req,v,help}] */
+function form(title, fields, onSubmit, { submit = "Uložit", intro = "" } = {}) {
+  const f = fields.map(x => {
+    const req = x.req ? "required" : "";
+    const v = x.v ?? "";
+    if (x.t === "html") return x.html;
+    if (x.t === "select") return `<label>${esc(x.l)}<select name="${x.n}" ${req}>${x.opts.map(o => `<option value="${esc(o[0])}" ${String(o[0]) === String(v) ? "selected" : ""}>${esc(o[1])}</option>`).join("")}</select>${x.help ? `<span class="small">${esc(x.help)}</span>` : ""}</label>`;
+    if (x.t === "textarea") return `<label>${esc(x.l)}<textarea name="${x.n}" rows="3" ${req}>${esc(v)}</textarea></label>`;
+    if (x.t === "check") return `<label class="chk"><input type="checkbox" name="${x.n}" ${v ? "checked" : ""}> ${esc(x.l)}</label>`;
+    return `<label>${esc(x.l)}<input name="${x.n}" type="${x.t || "text"}" value="${esc(v)}" ${x.t === "number" ? 'step="0.01"' : ""} ${req}>${x.help ? `<span class="small">${esc(x.help)}</span>` : ""}</label>`;
+  }).join("");
+  $("#modalBody").innerHTML = `<h3>${esc(title)}</h3>${intro}<form id="mf">${f}<p id="mfErr" class="err"></p>
+    <div class="row"><button class="btn primary">${esc(submit)}</button><button type="button" class="btn" onclick="closeModal()">Zrušit</button></div></form>`;
+  $("#modal").classList.remove("hidden");
+  const el = $("#mf");
+  el.querySelector("input,select,textarea")?.focus();
+  el.onsubmit = async e => {
+    e.preventDefault();
+    const data = {};
+    for (const x of fields) {
+      if (!x.n) continue;
+      const inp = el.elements[x.n];
+      data[x.n] = x.t === "check" ? inp.checked : inp.value;
+    }
+    try { const btn = el.querySelector(".primary"); btn.disabled = true; await onSubmit(data); closeModal(); }
+    catch (err) { $("#mfErr").textContent = err.message; el.querySelector(".primary").disabled = false; }
+  };
+}
+function table(cols, rows, { onClick, empty = "Žádné záznamy" } = {}) {
+  if (!rows.length) return `<p class="muted">${empty}</p>`;
+  const id = "t" + Math.random().toString(36).slice(2);
+  setTimeout(() => {
+    if (!onClick) return;
+    document.querySelectorAll(`#${id} tr[data-i]`).forEach(tr => tr.onclick = e => { if (!e.target.closest("button")) onClick(rows[tr.dataset.i]); });
+  });
+  return `<div class="tablewrap"><table id="${id}"><thead><tr>${cols.map(c => `<th class="${c.num ? "num" : ""}">${esc(c.l)}</th>`).join("")}</tr></thead>
+    <tbody>${rows.map((r, i) => `<tr data-i="${i}" class="${onClick ? "click" : ""}">${cols.map(c => `<td class="${c.num ? "num" : ""}">${c.f ? c.f(r) : esc(r[c.k])}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+}
+const propOpts = () => PROPS.map(p => [p.id, p.name]);
+const propName = id => PROPS.find(p => p.id == id)?.name || "";
+const isOwner = () => ME?.role === "owner";
+
+// ---------------------------------------------------------------- routing
+const PAGES = [
+  ["prehled", "Přehled", viewDashboard],
+  ["pokoje", "Obsazenost", viewRooms],
+  ["pobyty", "Pobyty a nájemníci", viewStays],
+  ["osoby", "Osoby", viewPersons],
+  ["platby", "Platby a doklady", viewPayments],
+  ["vydaje", "Výdaje", viewExpenses],
+  ["pokladna", "Pokladna", viewCash],
+  ["schvalovani", "Schvalování", viewApprovals],
+  ["uschova", "Úschova věcí", viewBelongings],
+  ["vstupy", "Vstupy do pokojů", viewEntries],
+  ["vykazy", "Finanční výkazy", viewReports],
+  ["audit", "Audit (kontrola)", viewAudit, true],
+  ["nastaveni", "Uživatelé a nastavení", viewSettings, true],
+];
+let pendingCount = 0;
+function renderNav() {
+  const cur = location.hash.slice(1) || "prehled";
+  $("#nav").innerHTML = PAGES.filter(p => !p[3] || isOwner()).map(p =>
+    `<a href="#${p[0]}" class="${p[0] === cur ? "on" : ""}">${p[1]}${p[0] === "schvalovani" && pendingCount ? `<span class="badge">${pendingCount}</span>` : ""}</a>`).join("");
+}
+async function route() {
+  const cur = location.hash.slice(1) || "prehled";
+  const page = PAGES.find(p => p[0] === cur) || PAGES[0];
+  $(".side").classList.remove("open");
+  $("#title").textContent = page[1];
+  $("#actions").innerHTML = "";
+  renderNav();
+  $("#view").innerHTML = `<p class="muted">Načítám…</p>`;
+  try { await page[2]($("#view")); } catch (e) { $("#view").innerHTML = `<div class="alert bad">${esc(e.message)}</div>`; }
+}
+window.addEventListener("hashchange", route);
+$("#menuBtn").onclick = () => $(".side").classList.toggle("open");
+const reload = () => route();
+function actions(btns) {
+  $("#actions").innerHTML = `<div class="row">${btns.map((b, i) => `<button class="btn ${b[2] || ""}" data-a="${i}">${esc(b[0])}</button>`).join("")}</div>`;
+  btns.forEach((b, i) => $(`#actions [data-a="${i}"]`).onclick = b[1]);
+}
+
+// ---------------------------------------------------------------- auth
+function logoutLocal() { TOKEN = ""; store.del("token"); $("#app").classList.add("hidden"); $("#login").classList.remove("hidden"); }
+$("#loginForm").onsubmit = async e => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  try {
+    const r = await api("/api/login", { body: { username: fd.get("username"), password: fd.get("password") } });
+    TOKEN = r.token; store.set("token", TOKEN); $("#loginErr").textContent = ""; e.target.reset(); start();
+  } catch (err) { $("#loginErr").textContent = err.message; }
+};
+function changePassword(forced) {
+  form(forced ? "Nastavte si vlastní heslo" : "Změna hesla", [
+    { n: "old", l: "Současné heslo", t: "password", req: 1 },
+    { n: "new", l: "Nové heslo (min. 8 znaků)", t: "password", req: 1 },
+    { n: "new2", l: "Nové heslo znovu", t: "password", req: 1 },
+  ], async d => {
+    if (d.new !== d.new2) throw new Error("Hesla se neshodují");
+    await api("/api/me/password", { body: d }); toast("Heslo změněno"); if (forced) start();
+  }, { intro: forced ? `<p class="muted">Z bezpečnostních důvodů si před prací nastavte vlastní heslo.</p>` : "" });
+}
+async function start() {
+  try { ME = await api("/api/me"); } catch { return logoutLocal(); }
+  $("#login").classList.add("hidden"); $("#app").classList.remove("hidden");
+  $("#who").innerHTML = `${esc(ME.name)} <span class="muted">(${ME.role === "owner" ? "majitel" : "správce"})</span><br>
+    <a onclick="changePassword()">Změnit heslo</a> · <a id="lo">Odhlásit</a>`;
+  $("#lo").onclick = async () => { await api("/api/logout", { body: {} }).catch(() => {}); logoutLocal(); };
+  if (ME.must_change_pw) { $("#view").innerHTML = ""; return changePassword(true); }
+  PROPS = await api("/api/properties");
+  if (isOwner()) pendingCount = (await api("/api/approvals")).filter(a => a.status === "pending").length;
+  route();
+}
+
+// ---------------------------------------------------------------- dashboard
+async function viewDashboard(v) {
+  const d = await api("/api/dashboard");
+  const m = d.month.reduce((a, r) => ({ expected: a.expected + r.expected, paid: a.paid + r.paid_rent + r.other_income, exp: a.exp + r.expenses }), { expected: 0, paid: 0, exp: 0 });
+  const cashTotal = d.cash.reduce((a, c) => a + c.expected, 0);
+  v.innerHTML = `
+  ${d.alerts.map(a => `<div class="alert ${a.level}">${esc(a.text)}</div>`).join("") || `<div class="alert ok">Vše v pořádku – žádná upozornění.</div>`}
+  <div class="grid g4 mb">
+    ${d.properties.map(p => `<div class="card stat"><div class="l">${esc(p.name)} – obsazenost</div>
+      <div class="v">${p.occupied} / ${p.capacity}</div><div class="bar"><i style="width:${p.capacity ? p.occupied / p.capacity * 100 : 0}%"></i></div></div>`).join("")}
+  </div>
+  <div class="grid g4 mb">
+    <div class="card stat"><div class="l">Předpis tento měsíc</div><div class="v">${kc(m.expected)}</div></div>
+    <div class="card stat"><div class="l">Vybráno tento měsíc</div><div class="v">${kc(m.paid)}</div></div>
+    <div class="card stat"><div class="l">Výdaje tento měsíc</div><div class="v">${kc(m.exp)}</div></div>
+    <div class="card stat"><div class="l">Celkové dluhy nájemníků</div><div class="v" style="color:var(--bad)">${kc(d.debt_total)}</div></div>
+    <div class="card stat"><div class="l">Hotovost v pokladnách (dle evidence)</div><div class="v">${kc(cashTotal)}</div></div>
+    <div class="card stat"><div class="l">Držené kauce</div><div class="v">${kc(d.deposits_held)}</div></div>
+  </div>
+  <div class="grid g2">
+    <div class="card"><h3>Největší dlužníci</h3>${table([
+      { l: "Osoba", f: r => esc(r.person_name) + (r.active ? "" : ` <span class="pill">odhlášen</span>`) },
+      { l: "Pokoj", f: r => esc(r.property_name + " " + r.unit_name) },
+      { l: "Dluh", num: 1, f: r => `<b style="color:var(--bad)">${kc(r.balance)}</b>` }], d.debts, { onClick: stayDetail, empty: "Nikdo nedluží." })}</div>
+    <div class="card"><h3>Tento měsíc podle objektů</h3>${table([
+      { l: "Objekt", k: "property_name" }, { l: "Předpis", num: 1, f: r => kc(r.expected) },
+      { l: "Vybráno", num: 1, f: r => kc(r.paid_rent + r.other_income) }, { l: "Výdaje", num: 1, f: r => kc(r.expenses) },
+      { l: "Zisk", num: 1, f: r => `<b>${kc(r.profit)}</b>` }], d.month)}</div>
+  </div>`;
+}
+
+// ---------------------------------------------------------------- rooms
+let roomProp = null;
+async function viewRooms(v) {
+  PROPS = await api("/api/properties");
+  if (!PROPS.length) { v.innerHTML = `<p class="muted">Nemáte přidělený žádný objekt.</p>`; return; }
+  roomProp = PROPS.find(p => p.id === roomProp?.id) || PROPS[0];
+  const p = roomProp;
+  if (isOwner()) actions([["+ Přidat pokoj/byt", () => addUnit(p)]]);
+  v.innerHTML = `<div class="tabs">${PROPS.map(x => `<button class="btn ${x.id === p.id ? "on" : ""}" data-p="${x.id}">${esc(x.name)} (${x.occupied}/${x.capacity})</button>`).join("")}</div>
+    <p class="small muted mb"><span class="pill ok">volno</span> <span class="pill warn">částečně</span> <span class="pill info">obsazeno</span> <span class="pill bad">dluh</span> <span class="pill">údržba</span></p>
+    <div class="rooms">${p.units.map(u => {
+      const cls = u.maintenance ? "maint" : u.occupied === 0 ? "free" : u.occupied < u.capacity ? "part" : "full";
+      return `<div class="room ${cls} ${u.debt > 0 ? "debt" : ""}" data-u="${u.id}"><b>${esc(u.name)}</b>
+        <div class="s">${UKIND[u.kind] || esc(u.kind)} · ${u.occupied}/${u.capacity}</div>
+        <div class="s">${u.stays.map(s => esc(s.person_name.split(" ").slice(-1)[0])).join(", ")}</div>
+        ${u.debt > 0 ? `<div class="s" style="color:var(--bad)">${kc(u.debt)}</div>` : ""}</div>`;
+    }).join("")}</div>`;
+  v.querySelectorAll("[data-p]").forEach(b => b.onclick = () => { roomProp = PROPS.find(x => x.id == b.dataset.p); viewRooms(v); });
+  v.querySelectorAll("[data-u]").forEach(b => b.onclick = () => unitDetail(p.units.find(u => u.id == b.dataset.u), p));
+}
+function addUnit(p) {
+  form("Nový pokoj / byt – " + p.name, [
+    { n: "name", l: "Označení", req: 1 },
+    { n: "kind", l: "Typ", t: "select", opts: Object.entries(UKIND) },
+    { n: "capacity", l: "Počet lůžek / nájemníků", t: "number", v: 1 },
+    { n: "price_night", l: "Cena za noc (za lůžko)", t: "number", v: 0 },
+    { n: "price_month", l: "Cena za měsíc (za lůžko / byt)", t: "number", v: 0 },
+  ], async d => { await api("/api/units", { body: { ...d, property_id: p.id } }); toast("Přidáno"); reload(); });
+}
+function unitDetail(u, p) {
+  $("#modalBody").innerHTML = `<h3>${esc(p.name)} – ${esc(u.name)}</h3>
+    <p class="muted">${UKIND[u.kind] || esc(u.kind)}, ${u.capacity} lůžek · ceník: ${kc(u.price_night)}/noc, ${kc(u.price_month)}/měsíc
+    ${u.maintenance ? ` · <span class="pill">v údržbě</span>` : ""}</p>
+    ${u.stays.length ? table([{ l: "Nájemník", k: "person_name" }, { l: "Od", f: r => dt(r.start_date) },
+      { l: "Saldo", num: 1, f: r => r.balance > 0 ? `<b style="color:var(--bad)">dluh ${kc(r.balance)}</b>` : `<span style="color:var(--ok)">${r.balance < 0 ? "přeplatek " + kc(-r.balance) : "OK"}</span>` }],
+      u.stays, { onClick: s => { closeModal(); stayDetail(s); } }) : `<p>Pokoj je volný.</p>`}
+    <div class="row" style="margin-top:12px">
+      ${!u.maintenance && u.occupied < u.capacity ? `<button class="btn primary" id="ciBtn">Ubytovat</button>` : ""}
+      <button class="btn" id="enBtn">Zapsat vstup do pokoje</button>
+      <button class="btn" id="mtBtn">${u.maintenance ? "Ukončit údržbu" : "Dát do údržby"}</button>
+      ${isOwner() ? `<button class="btn" id="edBtn">Upravit ceník</button>` : ""}
+      <button class="btn ghost" onclick="closeModal()">Zavřít</button></div>`;
+  $("#modal").classList.remove("hidden");
+  $("#ciBtn") && ($("#ciBtn").onclick = () => checkin(u, p));
+  $("#enBtn").onclick = () => roomEntry(u.id);
+  $("#mtBtn").onclick = async () => { await api(`/api/units/${u.id}`, { method: "PUT", body: { maintenance: u.maintenance ? 0 : 1 } }); closeModal(); reload(); };
+  $("#edBtn") && ($("#edBtn").onclick = () => form("Upravit " + u.name, [
+    { n: "name", l: "Označení", v: u.name }, { n: "capacity", l: "Kapacita", t: "number", v: u.capacity },
+    { n: "price_night", l: "Cena za noc", t: "number", v: u.price_night }, { n: "price_month", l: "Cena za měsíc", t: "number", v: u.price_month },
+  ], async d => { await api(`/api/units/${u.id}`, { method: "PUT", body: { name: d.name, capacity: +d.capacity, price_night: +d.price_night, price_month: +d.price_month } }); toast("Uloženo"); reload(); }));
+}
+
+// ---------------------------------------------------------------- check-in
+async function pickPerson() {
+  const persons = await api("/api/persons");
+  return [["", "— nová osoba (vyplňte níže) —"], ...persons.map(p => [p.id, p.name + (p.id_doc ? ` (${p.id_doc})` : "")])];
+}
+async function checkin(u, p) {
+  const opts = await pickPerson();
+  const monthly = p.type === "apartments";
+  form(`Ubytovat – ${p.name} ${u.name}`, [
+    { n: "person_id", l: "Existující osoba", t: "select", opts },
+    { t: "html", html: `<div class="f2">` },
+    { n: "name", l: "Jméno a příjmení (nová osoba)" }, { n: "id_doc", l: "Číslo OP / pasu" },
+    { n: "phone", l: "Telefon" }, { n: "birth", l: "Datum narození", t: "date" },
+    { t: "html", html: `</div><div class="f2">` },
+    { n: "start_date", l: "Od", t: "date", v: todayIso(), req: 1 },
+    { n: "planned_end", l: "Plánovaný konec (nepovinné)", t: "date" },
+    { n: "rate_type", l: "Platí", t: "select", v: monthly ? "month" : "night", opts: [["night", "za noc"], ["month", "za měsíc"]] },
+    { n: "rate", l: "Cena (prázdné = ceník)", t: "number", help: `Ceník: ${kc(u.price_night)}/noc, ${kc(u.price_month)}/měs.` },
+    { n: "deposit", l: "Kauce (požadovaná)", t: "number", v: monthly ? u.price_month : 0 },
+    { n: "deposit_paid", l: "Kauci platí teď", t: "select", opts: [["", "ne"], ["cash", "ano – hotově"], ["bank", "ano – převodem"]] },
+    { t: "html", html: `</div>` },
+    { n: "note", l: "Poznámka", t: "textarea" },
+  ], async d => {
+    let pid = d.person_id;
+    if (!pid) {
+      if (!d.name) throw new Error("Vyberte osobu nebo vyplňte jméno nové osoby");
+      pid = (await api("/api/persons", { body: { name: d.name, id_doc: d.id_doc, phone: d.phone, birth: d.birth } })).id;
+    }
+    const body = { unit_id: u.id, person_id: +pid, start_date: d.start_date, planned_end: d.planned_end, rate_type: d.rate_type, deposit: d.deposit || 0, note: d.note };
+    if (d.rate) body.rate = +d.rate;
+    const r = await api("/api/stays", { body });
+    if (d.deposit_paid && +d.deposit > 0) {
+      const pay = await api("/api/payments", { body: { kind: "deposit", stay_id: r.id, amount: +d.deposit, method: d.deposit_paid, note: "Kauce při nástupu" } });
+      printReceipt(pay);
+    }
+    toast(r.message, 6000); reload();
+  }, { submit: "Ubytovat" });
+}
+
+// ---------------------------------------------------------------- stays
+async function viewStays(v) {
+  const status = v.dataset.status || "active";
+  const rows = await api("/api/stays?status=" + status);
+  v.innerHTML = `<div class="tabs">${[["active", "Aktuální"], ["ended", "Ukončené"], ["all", "Vše"]].map(t => `<button class="btn ${t[0] === status ? "on" : ""}" data-s="${t[0]}">${t[1]}</button>`).join("")}</div>
+    <div class="card">${table([
+      { l: "Nájemník", k: "person_name" }, { l: "Objekt", k: "property_name" }, { l: "Pokoj", k: "unit_name" },
+      { l: "Od", f: r => dt(r.start_date) }, { l: "Do", f: r => r.checkout_date ? dt(r.checkout_date) : r.planned_end ? `<span class="muted">plán ${dt(r.planned_end)}</span>` : "" },
+      { l: "Cena", num: 1, f: r => kc(r.rate) + (r.rate_type === "night" ? "/noc" : "/měs") },
+      { l: "Předpis", num: 1, f: r => kc(r.expected) }, { l: "Zaplaceno", num: 1, f: r => kc(r.paid) },
+      { l: "Saldo", num: 1, f: r => r.balance > 0.5 ? `<b style="color:var(--bad)">−${kc(r.balance)}</b>` : `<span style="color:var(--ok)">${r.balance < -0.5 ? "+" + kc(-r.balance) : "OK"}</span>` },
+    ], rows, { onClick: stayDetail })}</div>`;
+  v.querySelectorAll("[data-s]").forEach(b => b.onclick = () => { v.dataset.status = b.dataset.s; viewStays(v); });
+}
+async function stayDetail(s) {
+  const person = await api(`/api/persons/${s.person_id}`);
+  const st = person.stays.find(x => x.id === s.id) || s;
+  const pays = person.payments.filter(p => p.stay_id === st.id);
+  $("#modalBody").innerHTML = `<h3>${esc(st.person_name)} – ${esc(st.property_name)} ${esc(st.unit_name)}</h3>
+    <p class="muted">Od ${dt(st.start_date)}${st.checkout_date ? " do " + dt(st.checkout_date) : ""} · ${kc(st.rate)} ${st.rate_type === "night" ? "za noc" : "za měsíc"} ·
+      ${st.periods} ${st.rate_type === "night" ? "nocí" : "měsíců"}</p>
+    <div class="grid g4 mb">
+      <div class="card stat"><div class="l">Předpis</div><div class="v">${kc(st.expected)}</div></div>
+      <div class="card stat"><div class="l">Zaplaceno</div><div class="v">${kc(st.paid)}</div></div>
+      <div class="card stat"><div class="l">${st.balance > 0 ? "Dluží" : "Přeplatek"}</div><div class="v" style="color:${st.balance > 0.5 ? "var(--bad)" : "var(--ok)"}">${kc(Math.abs(st.balance))}</div></div>
+      <div class="card stat"><div class="l">Kauce složena</div><div class="v">${kc(st.deposit_held)}</div><div class="small muted">požadováno ${kc(st.deposit)}</div></div>
+    </div>
+    <h3>Platby k pobytu</h3>
+    ${table([{ l: "Doklad", k: "receipt_no" }, { l: "Datum", f: r => dt(r.date) }, { l: "Druh", f: r => KIND[r.kind] }, { l: "Způsob", f: r => METHOD[r.method] }, { l: "Částka", num: 1, f: r => kc(r.amount) }], pays)}
+    <div class="row" style="margin-top:12px">
+      <button class="btn primary" id="payBtn">Přijmout platbu</button>
+      ${st.active ? `<button class="btn" id="coBtn">Odhlásit (konec pobytu)</button><button class="btn" id="rtBtn">Změnit cenu</button>` : ""}
+      ${st.deposit_held > 0 ? `<button class="btn" id="drBtn">Vrátit kauci</button>` : ""}
+      <button class="btn ghost" onclick="closeModal()">Zavřít</button></div>`;
+  $("#modal").classList.remove("hidden");
+  $("#payBtn").onclick = () => takePayment(st);
+  $("#coBtn") && ($("#coBtn").onclick = () => form("Odhlášení – " + st.person_name, [
+    { n: "date", l: "Datum odchodu", t: "date", v: todayIso(), req: 1 },
+    { n: "room_check", l: "Stav pokoje při předání (vybavení, škody, klíče)", t: "textarea", req: 1 },
+  ], async d => {
+    const r = await api(`/api/stays/${st.id}/checkout`, { body: d });
+    toast(r.balance > 0.5 ? `Odhlášeno. POZOR: zůstává dluh ${kc(r.balance)}` : "Odhlášeno.", 7000); reload();
+  }, { intro: st.balance > 0.5 ? `<div class="alert bad">Nájemník dluží ${kc(st.balance)}. Dluh zůstane evidován i po odhlášení.</div>` : "" }));
+  $("#rtBtn") && ($("#rtBtn").onclick = () => form("Změna ceny", [{ n: "rate", l: "Nová cena", t: "number", v: st.rate, req: 1 }],
+    async d => { toast((await api(`/api/stays/${st.id}/rate`, { body: d })).message); reload(); },
+    { intro: isOwner() ? "" : `<p class="muted">Změnu ceny schvaluje majitel.</p>` }));
+  $("#drBtn") && ($("#drBtn").onclick = () => form("Vrácení kauce", [
+    { n: "amount", l: "Částka k vrácení", t: "number", v: st.deposit_held, req: 1 },
+    { n: "method", l: "Způsob", t: "select", opts: Object.entries(METHOD) },
+    { n: "reason", l: "Důvod / srážky (škody, dluh…)", t: "textarea" },
+  ], async d => { toast((await api(`/api/stays/${st.id}/deposit_refund`, { body: d })).message); reload(); },
+    { intro: `<p class="muted">Vrácení kauce vždy schvaluje majitel – teprve pak se vydá peníze.</p>` }));
+}
+function takePayment(st) {
+  form(`Platba – ${st.person_name}`, [
+    { n: "kind", l: "Za co", t: "select", opts: [["rent", "Nájem / ubytování"], ["deposit", "Kauce"]] },
+    { n: "amount", l: "Částka", t: "number", v: st.balance > 0 ? st.balance : st.rate, req: 1 },
+    { n: "method", l: "Způsob", t: "select", opts: Object.entries(METHOD) },
+    { n: "note", l: "Poznámka (např. za období)" },
+  ], async d => { const p = await api("/api/payments", { body: { ...d, stay_id: st.id } }); toast("Přijato – doklad " + p.receipt_no); printReceipt(p); reload(); },
+  { submit: "Přijmout a vystavit doklad" });
+}
+function printReceipt(p) {
+  const html = `
+    <h2>Příjmový doklad č. ${esc(p.receipt_no)}</h2>
+    <table><tr><td>Objekt</td><td>${esc(propName(p.property_id))}</td></tr><tr><td>Datum</td><td>${dt(p.date)}</td></tr>
+    <tr><td>Druh</td><td>${KIND[p.kind]}</td></tr><tr><td>Způsob</td><td>${METHOD[p.method]}</td></tr>
+    <tr><td>Částka</td><td><b>${kc(p.amount)}</b></td></tr><tr><td>Poznámka</td><td>${esc(p.note)}</td></tr>
+    <tr><td>Přijal</td><td>${esc(ME.name)}</td></tr></table>
+    <p style="margin-top:40px">Podpis plátce: ____________ &nbsp; Podpis příjemce: ____________</p>
+    <p style="font-size:11px;color:#666">Doklad je evidován v systému a nelze jej smazat. Na každou platbu musí být vystaven doklad.</p>
+`;
+  const w = window.DEMO_API ? null : window.open("", "_blank", "width=420,height=560");
+  if (w) { w.document.write(`<html><head><title>Doklad ${esc(p.receipt_no)}</title><style>body{font:14px system-ui;padding:20px}td{padding:4px 8px}</style></head><body>${html}<script>print()<\/script></body></html>`); return; }
+  $("#modalBody").innerHTML = `<div class="receipt">${html}</div><div class="row" style="margin-top:12px"><button class="btn primary" onclick="closeModal()">Zavřít</button></div>`;
+  $("#modal").classList.remove("hidden");
+}
+
+// ---------------------------------------------------------------- persons
+async function viewPersons(v) {
+  actions([["+ Nová osoba", () => editPerson({})]]);
+  const term = v.dataset.q || "";
+  const rows = await api("/api/persons?q=" + encodeURIComponent(term));
+  v.innerHTML = `<div class="row mb"><input id="pq" placeholder="Hledat jméno, doklad, telefon…" value="${esc(term)}" style="padding:7px 9px;border:1px solid var(--line);border-radius:7px;min-width:260px;background:var(--card);color:var(--ink)"></div>
+    <div class="card">${table([{ l: "Jméno", k: "name" }, { l: "Doklad", k: "id_doc" }, { l: "Narozen", f: r => dt(r.birth) }, { l: "Telefon", k: "phone" }, { l: "Poznámka", k: "note" }],
+    rows, { onClick: personDetail })}</div>`;
+  const pq = $("#pq"); pq.onchange = () => { v.dataset.q = pq.value; viewPersons(v); };
+}
+function editPerson(p) {
+  form(p.id ? "Upravit osobu" : "Nová osoba", [
+    { n: "name", l: "Jméno a příjmení", v: p.name, req: 1 }, { n: "id_doc", l: "Číslo OP / pasu", v: p.id_doc },
+    { n: "birth", l: "Datum narození", t: "date", v: p.birth }, { n: "phone", l: "Telefon", v: p.phone },
+    { n: "email", l: "E-mail", v: p.email }, { n: "note", l: "Poznámka", t: "textarea", v: p.note },
+  ], async d => { await api(p.id ? `/api/persons/${p.id}` : "/api/persons", { method: p.id ? "PUT" : "POST", body: d }); toast("Uloženo"); reload(); });
+}
+async function personDetail(p0) {
+  const p = await api(`/api/persons/${p0.id}`);
+  $("#modalBody").innerHTML = `<h3>${esc(p.name)}</h3><p class="muted">${esc(p.id_doc)} · ${esc(p.phone)} · ${esc(p.email)}</p>
+    <h3>Pobyty</h3>${table([{ l: "Pokoj", f: r => esc(r.property_name + " " + r.unit_name) }, { l: "Od", f: r => dt(r.start_date) }, { l: "Do", f: r => dt(r.checkout_date) },
+      { l: "Saldo", num: 1, f: r => r.balance > 0.5 ? `<b style="color:var(--bad)">−${kc(r.balance)}</b>` : "OK" }], p.stays, { onClick: s => { closeModal(); stayDetail(s); } })}
+    <h3>Věci v úschově</h3>${table([{ l: "Věc", k: "description" }, { l: "Přijato", f: r => dtt(r.received_at) }, { l: "Stav", f: r => r.returned_at ? "vydáno " + dtt(r.returned_at) : `<span class="pill warn">v úschově</span>` }], p.belongings)}
+    <div class="row" style="margin-top:12px"><button class="btn" id="epBtn">Upravit údaje</button><button class="btn ghost" onclick="closeModal()">Zavřít</button></div>`;
+  $("#modal").classList.remove("hidden");
+  $("#epBtn").onclick = () => editPerson(p);
+}
+
+// ---------------------------------------------------------------- payments
+async function viewPayments(v) {
+  const month = v.dataset.m || todayIso().slice(0, 7);
+  const [y, m] = month.split("-").map(Number);
+  const last = new Date(y, m, 0).getDate();
+  const rows = await api(`/api/payments?from=${month}-01&to=${month}-${String(last).padStart(2, "0")}`);
+  actions([["+ Ostatní příjem", () => form("Ostatní příjem (bez pobytu)", [
+    { n: "property_id", l: "Objekt", t: "select", opts: propOpts() }, { n: "amount", l: "Částka", t: "number", req: 1 },
+    { n: "method", l: "Způsob", t: "select", opts: Object.entries(METHOD) }, { n: "note", l: "Za co", req: 1 },
+  ], async d => { const p = await api("/api/payments", { body: { ...d, kind: "other" } }); printReceipt(p); reload(); })]]);
+  const sum = k => rows.filter(r => r.method === k).reduce((a, r) => a + r.amount, 0);
+  v.innerHTML = `<div class="row mb"><label class="muted">Měsíc <input type="month" id="pm" value="${month}"></label>
+    <span class="pill">hotově ${kc(sum("cash"))}</span><span class="pill">převodem ${kc(sum("bank"))}</span><span class="pill">kartou ${kc(sum("card"))}</span></div>
+    <p class="small muted">Platby nelze upravit ani smazat. Chybu opravíte stornem, které schvaluje majitel. Čísla dokladů jdou souvisle za sebou.</p>
+    <div class="card">${table([
+      { l: "Doklad", k: "receipt_no" }, { l: "Datum", f: r => dt(r.date) }, { l: "Objekt", k: "property_name" }, { l: "Plátce", k: "person_name" },
+      { l: "Druh", f: r => KIND[r.kind] + (r.storno_receipt ? ` <span class="pill bad">stornováno ${esc(r.storno_receipt)}</span>` : "") },
+      { l: "Způsob", f: r => METHOD[r.method] }, { l: "Částka", num: 1, f: r => kc(r.amount) }, { l: "Zapsal", k: "created_by_name" },
+      { l: "", f: r => ["rent", "deposit", "other"].includes(r.kind) && !r.storno_receipt ? `<button class="btn sm danger" data-st="${r.id}">Storno</button> <button class="btn sm" data-pr="${r.id}">Tisk</button>` : "" },
+    ], rows)}</div>`;
+  $("#pm").onchange = e => { v.dataset.m = e.target.value; viewPayments(v); };
+  v.querySelectorAll("[data-st]").forEach(b => b.onclick = () => form("Storno platby", [{ n: "reason", l: "Důvod storna", t: "textarea", req: 1 }],
+    async d => { toast((await api(`/api/payments/${b.dataset.st}/storno`, { body: d })).message); reload(); }));
+  v.querySelectorAll("[data-pr]").forEach(b => b.onclick = () => printReceipt(rows.find(r => r.id == b.dataset.pr)));
+}
+
+// ---------------------------------------------------------------- expenses
+async function viewExpenses(v) {
+  const rows = await api("/api/expenses");
+  const st = await api("/api/settings");
+  actions([["+ Nový výdaj", () => form("Nový výdaj", [
+    { n: "property_id", l: "Objekt", t: "select", opts: propOpts() },
+    { t: "html", html: `<div class="f2">` },
+    { n: "date", l: "Datum", t: "date", v: todayIso(), req: 1 }, { n: "amount", l: "Částka", t: "number", req: 1 },
+    { n: "category", l: "Kategorie", t: "select", opts: EXP_CAT.map(c => [c, c]) }, { n: "method", l: "Placeno", t: "select", opts: Object.entries(METHOD) },
+    { n: "supplier", l: "Dodavatel" }, { n: "doc_no", l: "Číslo účtenky / faktury", req: 1 },
+    { t: "html", html: `</div>` },
+    { n: "description", l: "Co bylo koupeno / opraveno", t: "textarea", req: 1 },
+  ], async d => { toast((await api("/api/expenses", { body: d })).message, 5000); reload(); },
+  { intro: `<p class="muted">Výdaje nad ${kc(st.expense_limit)} schvaluje majitel. Účtenku si uschovejte – číslo dokladu je povinné.</p>` })]]);
+  const S = { pending: `<span class="pill warn">čeká</span>`, approved: `<span class="pill ok">schváleno</span>`, rejected: `<span class="pill bad">zamítnuto</span>` };
+  v.innerHTML = `<div class="card">${table([
+    { l: "Datum", f: r => dt(r.date) }, { l: "Objekt", k: "property_name" }, { l: "Kategorie", k: "category" }, { l: "Popis", k: "description" },
+    { l: "Dodavatel", k: "supplier" }, { l: "Doklad", k: "doc_no" }, { l: "Placeno", f: r => METHOD[r.method] },
+    { l: "Částka", num: 1, f: r => kc(r.amount) }, { l: "Stav", f: r => S[r.status] }, { l: "Zapsal", k: "created_by_name" }], rows)}</div>`;
+}
+
+// ---------------------------------------------------------------- cash
+async function viewCash(v) {
+  const rows = await api("/api/cash");
+  v.innerHTML = `<p class="muted">Systém sám počítá, kolik hotovosti má být v pokladně (příjmy hotově − výdaje hotově − odvody). Při uzávěrce správce peníze fyzicky spočítá a zadá skutečnou částku.
+     Každý rozdíl se trvale zapíše a majitel ho vidí.</p>` + rows.map(c => `
+    <div class="card mb"><div class="row" style="justify-content:space-between"><h3>${esc(c.property_name)}</h3>
+      <div class="row"><button class="btn primary" data-close="${c.property_id}">Uzávěrka pokladny</button><button class="btn" data-tr="${c.property_id}">Odvod hotovosti</button></div></div>
+      <div class="grid g4 mb">
+        <div class="stat"><div class="l">Má být v pokladně</div><div class="v">${kc(c.expected)}</div></div>
+        <div class="stat"><div class="l">Příjmy hotově celkem</div><div class="v">${kc(c.income_cash)}</div></div>
+        <div class="stat"><div class="l">Výdaje hotově</div><div class="v">${kc(c.expenses_cash)}</div>${c.pending_cash_expenses ? `<div class="small muted">+ ${kc(c.pending_cash_expenses)} čeká na schválení</div>` : ""}</div>
+        <div class="stat"><div class="l">Manka / přebytky celkem</div><div class="v" style="color:${c.differences_total < 0 ? "var(--bad)" : "inherit"}">${kc(c.differences_total)}</div></div>
+      </div>
+      <div class="grid g2"><div><h3>Uzávěrky</h3>${table([{ l: "Kdy", f: r => dtt(r.created_at) }, { l: "Kdo", k: "user_name" }, { l: "Mělo být", num: 1, f: r => kc(r.expected) },
+        { l: "Spočítáno", num: 1, f: r => kc(r.counted) }, { l: "Rozdíl", num: 1, f: r => Math.abs(r.difference) < 0.01 ? "0" : `<b style="color:var(--bad)">${kc(r.difference)}</b>` }, { l: "Pozn.", k: "note" }], c.closings)}</div>
+      <div><h3>Odvody hotovosti</h3>${table([{ l: "Datum", f: r => dt(r.date) }, { l: "Částka", num: 1, f: r => kc(r.amount) }, { l: "Převzal", k: "received_by" }, { l: "Předal", k: "user_name" }], c.transfers_list)}</div></div>
+    </div>`).join("");
+  v.querySelectorAll("[data-close]").forEach(b => b.onclick = () => form("Uzávěrka pokladny – " + propName(b.dataset.close), [
+    { n: "counted", l: "Skutečně spočítaná hotovost v pokladně", t: "number", req: 1 },
+    { n: "note", l: "Poznámka (povinná při rozdílu)", t: "textarea" },
+  ], async d => {
+    const r = await api("/api/cash/closing", { body: { ...d, property_id: +b.dataset.close } });
+    toast(Math.abs(r.difference) < 0.01 ? "Pokladna sedí." : `Rozdíl ${kc(r.difference)} byl zaevidován.`, 6000); reload();
+  }, { intro: `<p class="muted">Nejdřív peníze spočítejte, teprve potom se dozvíte, kolik mělo být. Tak se nedá „dopočítat“ k očekávané částce.</p>` }));
+  v.querySelectorAll("[data-tr]").forEach(b => b.onclick = () => form("Odvod hotovosti – " + propName(b.dataset.tr), [
+    { n: "amount", l: "Částka", t: "number", req: 1 }, { n: "received_by", l: "Kdo peníze převzal (jméno) / vklad na účet", req: 1 }, { n: "note", l: "Poznámka" },
+  ], async d => { await api("/api/cash/transfer", { body: { ...d, property_id: +b.dataset.tr } }); toast("Odvod zapsán"); reload(); }));
+}
+
+// ---------------------------------------------------------------- approvals
+async function viewApprovals(v) {
+  const rows = await api("/api/approvals");
+  pendingCount = isOwner() ? rows.filter(a => a.status === "pending").length : 0; renderNav();
+  const S = { pending: `<span class="pill warn">čeká</span>`, approved: `<span class="pill ok">schváleno</span>`, rejected: `<span class="pill bad">zamítnuto</span>` };
+  v.innerHTML = `<p class="muted">${isOwner() ? "Operace, u kterých je riziko zneužití, se provedou až po vašem schválení." : "Vaše žádosti, které čekají na majitele."}</p>
+    <div class="card">${table([{ l: "Kdy", f: r => dtt(r.requested_at) }, { l: "Typ", f: r => APPR[r.type] || r.type }, { l: "Popis", k: "summary" }, { l: "Žadatel", k: "requested_by_name" },
+      { l: "Stav", f: r => S[r.status] + (r.decided_by_name ? `<div class="small muted">${esc(r.decided_by_name)} ${dtt(r.decided_at)} ${esc(r.decision_note)}</div>` : "") },
+      { l: "", f: r => isOwner() && r.status === "pending" ? `<div class="row"><button class="btn sm primary" data-ok="${r.id}">Schválit</button><button class="btn sm danger" data-no="${r.id}">Zamítnout</button></div>` : "" }], rows)}</div>`;
+  const decide = (id, approve) => form(approve ? "Schválit" : "Zamítnout", [{ n: "note", l: "Poznámka" }],
+    async d => { await api(`/api/approvals/${id}/decide`, { body: { approve, note: d.note } }); toast("Vyřízeno"); reload(); }, { submit: approve ? "Schválit" : "Zamítnout" });
+  v.querySelectorAll("[data-ok]").forEach(b => b.onclick = () => decide(b.dataset.ok, true));
+  v.querySelectorAll("[data-no]").forEach(b => b.onclick = () => decide(b.dataset.no, false));
+}
+
+// ---------------------------------------------------------------- belongings
+async function viewBelongings(v) {
+  const rows = await api("/api/belongings");
+  actions([["+ Převzít věc do úschovy", async () => {
+    const opts = await pickPerson();
+    const units = PROPS.flatMap(p => p.units.map(u => [u.id, p.name + " " + u.name]));
+    form("Převzetí věci do úschovy", [
+      { n: "person_id", l: "Komu věc patří", t: "select", opts: [["", "— neznámý majitel / nalezeno —"], ...opts.slice(1)] },
+      { n: "unit_id", l: "Odkud (pokoj)", t: "select", opts: [["", "—"], ...units] },
+      { n: "description", l: "Přesný popis věcí (co, kolik, stav, sériová čísla, peníze spočítat!)", t: "textarea", req: 1 },
+      { n: "reason", l: "Důvod převzetí", t: "select", opts: [["Nájemník požádal o úschovu", "Nájemník požádal o úschovu"], ["Věci zůstaly po odchodu nájemníka", "Věci zůstaly po odchodu"], ["Nalezená věc", "Nalezená věc"], ["Vyklizení pokoje", "Vyklizení pokoje"], ["Jiný", "Jiný"]] },
+      { n: "witness", l: "Svědek (jméno) – povinné", req: 1 },
+    ], async d => { await api("/api/belongings", { body: d }); toast("Zapsáno do úschovy"); reload(); },
+    { intro: `<p class="muted">Každou převzatou věc přesně popište za přítomnosti svědka. Záznam nelze smazat ani přepsat a vydat jej lze jen jednou.</p>` });
+  }]]);
+  v.innerHTML = `<div class="card">${table([
+    { l: "Převzato", f: r => dtt(r.received_at) }, { l: "Majitel věci", f: r => esc(r.person_name || "neznámý") }, { l: "Pokoj", k: "unit_name" },
+    { l: "Popis", k: "description" }, { l: "Důvod", k: "reason" }, { l: "Převzal / svědek", f: r => esc(r.received_by_name) + " / " + esc(r.witness) },
+    { l: "Stav", f: r => r.returned_at ? `vydáno ${dtt(r.returned_at)}<div class="small muted">komu: ${esc(r.returned_to)}, svědek ${esc(r.return_witness)}</div>` : `<button class="btn sm" data-ret="${r.id}">Vydat</button>` },
+  ], rows)}</div>`;
+  v.querySelectorAll("[data-ret]").forEach(b => b.onclick = () => form("Vydání věci", [
+    { n: "returned_to", l: "Komu vydáno (jméno, číslo dokladu)", req: 1 }, { n: "witness", l: "Svědek", req: 1 },
+  ], async d => { await api(`/api/belongings/${b.dataset.ret}/return`, { body: d }); toast("Vydáno"); reload(); }));
+}
+
+// ---------------------------------------------------------------- room entries
+function roomEntry(unitId) {
+  const units = PROPS.flatMap(p => p.units.map(u => [u.id, p.name + " " + u.name]));
+  form("Záznam o vstupu do pokoje", [
+    { n: "unit_id", l: "Pokoj", t: "select", opts: units, v: unitId },
+    { n: "entered_at", l: "Kdy", t: "datetime-local", v: new Date(Date.now() - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0, 16) },
+    { n: "reason", l: "Důvod vstupu", t: "select", opts: [["Oprava / údržba", "Oprava / údržba"], ["Úklid", "Úklid"], ["Kontrola stavu", "Kontrola stavu"], ["Havárie (voda, požár…)", "Havárie"], ["Odečet energií", "Odečet energií"], ["Jiný", "Jiný"]] },
+    { n: "tenant_present", l: "Nájemník byl přítomen", t: "check" },
+    { n: "tenant_notified", l: "Nájemník byl předem informován", t: "check" },
+    { n: "witness", l: "Svědek (povinné, pokud nájemník nebyl přítomen)" },
+    { n: "note", l: "Co se v pokoji dělo", t: "textarea" },
+  ], async d => { await api("/api/entries", { body: d }); toast("Vstup zapsán"); if (location.hash === "#vstupy") reload(); });
+}
+async function viewEntries(v) {
+  actions([["+ Zapsat vstup", () => roomEntry()]]);
+  const rows = await api("/api/entries");
+  v.innerHTML = `<p class="muted">Každý vstup personálu do obsazeného pokoje se musí zapsat. Bez přítomnosti nájemníka jen se svědkem. Záznamy nelze mazat.</p>
+    <div class="card">${table([{ l: "Kdy", f: r => dtt(r.entered_at) }, { l: "Pokoj", f: r => esc(r.property_name + " " + r.unit_name) }, { l: "Kdo", k: "user_name" },
+      { l: "Důvod", k: "reason" }, { l: "Nájemník", f: r => r.tenant_present ? `<span class="pill ok">přítomen</span>` : `<span class="pill warn">nepřítomen</span>` + (r.tenant_notified ? " informován" : "") },
+      { l: "Svědek", k: "witness" }, { l: "Poznámka", k: "note" }], rows)}</div>`;
+}
+
+// ---------------------------------------------------------------- reports
+async function viewReports(v) {
+  const month = v.dataset.m || todayIso().slice(0, 7);
+  const r = await api("/api/report?month=" + month);
+  const tot = r.rows.reduce((a, x) => ({ e: a.e + x.expected, p: a.p + x.paid_rent, o: a.o + x.other_income, x: a.x + x.expenses, z: a.z + x.profit }), { e: 0, p: 0, o: 0, x: 0, z: 0 });
+  actions([["Tisk", () => print()]]);
+  v.innerHTML = `<div class="row mb"><label class="muted">Měsíc <input type="month" id="rm" value="${month}"></label></div>
+    <div class="card mb">${table([{ l: "Objekt", k: "property_name" }, { l: "Předpis nájmů", num: 1, f: x => kc(x.expected) }, { l: "Vybráno nájmů", num: 1, f: x => kc(x.paid_rent) },
+      { l: "Úspěšnost výběru", num: 1, f: x => x.expected ? Math.round(x.paid_rent / x.expected * 100) + " %" : "—" },
+      { l: "Ostatní příjmy", num: 1, f: x => kc(x.other_income) }, { l: "Výdaje", num: 1, f: x => kc(x.expenses) }, { l: "Zisk", num: 1, f: x => `<b>${kc(x.profit)}</b>` }],
+      [...r.rows, { property_name: "CELKEM", expected: tot.e, paid_rent: tot.p, other_income: tot.o, expenses: tot.x, profit: tot.z }])}</div>
+    <div class="grid g2">${r.rows.map(x => `<div class="card"><h3>Výdaje – ${esc(x.property_name)}</h3>${table([{ l: "Kategorie", k: "category" }, { l: "Částka", num: 1, f: c => kc(c.s) }], x.expenses_by_category, { empty: "Bez výdajů" })}</div>`).join("")}</div>
+    <p class="small muted">Předpis = kolik měli nájemníci za měsíc zaplatit podle skutečně evidovaných pobytů. Vybráno = přijaté platby nájmu (po odečtení storen). Velký rozdíl mezi nimi znamená dluhy nebo nezaevidované platby.</p>`;
+  $("#rm").onchange = e => { v.dataset.m = e.target.value; viewReports(v); };
+}
+
+// ---------------------------------------------------------------- audit
+async function viewAudit(v) {
+  const term = v.dataset.q || "";
+  const rows = await api("/api/audit?limit=500&q=" + encodeURIComponent(term));
+  actions([["Ověřit neporušenost", async () => {
+    const r = await api("/api/audit/verify");
+    const gaps = r.receipt_gaps?.length ? ` POZOR: chybí čísla dokladů: ${r.receipt_gaps.map(g => g.year + ": " + g.missing.join(", ")).join("; ")}` : " Řada dokladů je souvislá.";
+    $("#verifyRes").innerHTML = r.ok ? `<div class="alert ok">Záznamy jsou neporušené (${r.checked} záznamů ověřeno).${esc(gaps)}<br><span class="small">Kontrolní otisk: <code>${esc(r.last_hash)}</code> – poznamenejte si ho; pokud ho příště nenajdete v historii, data byla podvržena.</span></div>`
+      : `<div class="alert bad">NARUŠENO! Záznam č. ${r.broken_at} byl změněn mimo systém. Data mohla být zfalšována – obnovte zálohu a prověřte, kdo měl přístup k počítači.</div>`;
+  }, "primary"], ["Zálohovat databázi", async () => { const r = await api("/api/backup"); toast("Záloha uložena: " + r.file, 7000); }],
+    ...(window.DEMO_API ? [["Simulovat podvod v databázi", async () => { toast((await api("/api/demo/tamper", { body: {} })).message, 8000); }, "danger"]] : [])]);
+  v.innerHTML = `<div id="verifyRes"></div>
+    <p class="muted">Kompletní neměnitelná historie všech akcí. Každý záznam je kryptograficky svázaný s předchozím – smazání nebo změna kteréhokoli z nich se při ověření odhalí.</p>
+    <div class="row mb"><input id="aq" placeholder="Hledat (akce, uživatel, obsah)…" value="${esc(term)}" style="padding:7px 9px;border:1px solid var(--line);border-radius:7px;min-width:260px;background:var(--card);color:var(--ink)"></div>
+    <div class="card">${table([{ l: "#", k: "id" }, { l: "Čas", f: r => dtt(r.ts) }, { l: "Uživatel", k: "username" }, { l: "Akce", f: r => `<b>${esc(r.action)}</b>` },
+      { l: "Objekt", f: r => esc((r.entity || "") + (r.entity_id ? " #" + r.entity_id : "")) }, { l: "Detail", f: r => `<code>${esc(r.details)}</code>` }], rows)}</div>`;
+  const aq = $("#aq"); aq.onchange = () => { v.dataset.q = aq.value; viewAudit(v); };
+}
+
+// ---------------------------------------------------------------- settings
+async function viewSettings(v) {
+  const [users, st] = await Promise.all([api("/api/users"), api("/api/settings")]);
+  const allProps = await api("/api/properties");
+  const propChecks = sel => allProps.map(p => ({ n: "p" + p.id, l: p.name, t: "check", v: sel.includes(p.id) }));
+  const readProps = d => allProps.filter(p => d["p" + p.id]).map(p => p.id);
+  actions([["+ Nový uživatel", () => form("Nový uživatel", [
+    { n: "name", l: "Jméno", req: 1 }, { n: "username", l: "Přihlašovací jméno", req: 1 }, { n: "password", l: "Počáteční heslo (min. 8 znaků)", req: 1 },
+    { n: "role", l: "Role", t: "select", opts: [["manager", "Správce (omezená práva)"], ["owner", "Majitel (plná práva)"]] },
+    { t: "html", html: `<p class="small muted">Objekty, ke kterým má správce přístup:</p>` }, ...propChecks([]),
+  ], async d => { await api("/api/users", { body: { ...d, properties: readProps(d) } }); toast("Uživatel vytvořen"); reload(); }), "primary"],
+  ["+ Nový objekt", () => form("Nový objekt", [{ n: "name", l: "Název", req: 1 }, { n: "type", l: "Typ", t: "select", opts: Object.entries(PTYPE) }, { n: "address", l: "Adresa" }],
+    async d => { await api("/api/properties", { body: d }); PROPS = await api("/api/properties"); toast("Objekt vytvořen"); reload(); })]]);
+  v.innerHTML = `<div class="grid g2">
+    <div class="card"><h3>Uživatelé</h3>${table([{ l: "Jméno", k: "name" }, { l: "Login", k: "username" }, { l: "Role", f: r => r.role === "owner" ? "majitel" : "správce" },
+      { l: "Objekty", f: r => r.role === "owner" ? "vše" : esc(r.properties.map(propName).join(", ") || "žádné") },
+      { l: "Stav", f: r => r.active ? `<span class="pill ok">aktivní</span>` : `<span class="pill bad">zablokován</span>` }], users, {
+      onClick: u => form("Upravit " + u.name, [
+        { n: "active", l: "Účet aktivní", t: "check", v: u.active }, { n: "password", l: "Nové heslo (nechte prázdné = beze změny)" },
+        { t: "html", html: `<p class="small muted">Přístup k objektům:</p>` }, ...propChecks(u.properties),
+      ], async d => { await api(`/api/users/${u.id}`, { method: "PUT", body: { active: d.active, password: d.password, properties: readProps(d) } }); toast("Uloženo"); reload(); }),
+    })}</div>
+    <div class="card"><h3>Pravidla (pojistky)</h3><form id="sf">
+      <label>Výdaje nad tuto částku schvaluje majitel (Kč)<input name="expense_limit" type="number" value="${esc(st.expense_limit)}"></label>
+      <label>Tolerovaný rozdíl v pokladně bez vysvětlení (Kč)<input name="cash_tolerance" type="number" value="${esc(st.cash_tolerance)}"></label>
+      <label>Sleva pod ceník nad tolik % jde ke schválení<input name="rate_tolerance_pct" type="number" value="${esc(st.rate_tolerance_pct)}"></label>
+      <button class="btn primary">Uložit pravidla</button></form>
+      <p class="small muted">Každá změna pravidel se zapisuje do auditu.</p></div></div>`;
+  $("#sf").onsubmit = async e => { e.preventDefault(); const fd = Object.fromEntries(new FormData(e.target)); await api("/api/settings", { method: "PUT", body: fd }); toast("Pravidla uložena"); };
+}
+
+if (TOKEN) start(); else logoutLocal();
+
+document.getElementById("demoReset").onclick = () => { window.DEMO_RESET(); store.del("token"); location.hash = ""; location.reload(); };
+</script>

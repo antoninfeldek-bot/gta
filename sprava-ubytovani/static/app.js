@@ -13,10 +13,21 @@ const UKIND = { single: "1lůžkový", double: "2lůžkový", room: "Pokoj", apa
 const APPR = { payment_storno: "Storno platby", deposit_refund: "Vrácení kauce", expense: "Výdaj", rate_discount: "Sleva / změna ceny" };
 const EXP_CAT = ["Opravy a údržba", "Úklid a drogerie", "Energie", "Materiál", "Vybavení", "Služby", "Poplatky", "Ostatní"];
 
-let TOKEN = localStorage.getItem("token") || "";
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+  del(k) { try { localStorage.removeItem(k); } catch {} },
+};
+let TOKEN = store.get("token") || "";
 let ME = null, PROPS = [], CACHE = {};
 
 async function api(path, opts = {}) {
+  if (window.DEMO_API) {  // webová ukázka: "server" běží přímo v prohlížeči
+    const r = window.DEMO_API(path, opts.method || (opts.body ? "POST" : "GET"), opts.body, TOKEN);
+    if (r.status === 401 && path !== "/api/login") { logoutLocal(); throw new Error(r.data.error); }
+    if (r.status !== 200) throw new Error(r.data.error || "Chyba");
+    return r.data;
+  }
   const r = await fetch(path, {
     method: opts.method || (opts.body ? "POST" : "GET"),
     headers: { "Content-Type": "application/json", Authorization: "Bearer " + TOKEN },
@@ -114,13 +125,13 @@ function actions(btns) {
 }
 
 // ---------------------------------------------------------------- auth
-function logoutLocal() { TOKEN = ""; localStorage.removeItem("token"); $("#app").classList.add("hidden"); $("#login").classList.remove("hidden"); }
+function logoutLocal() { TOKEN = ""; store.del("token"); $("#app").classList.add("hidden"); $("#login").classList.remove("hidden"); }
 $("#loginForm").onsubmit = async e => {
   e.preventDefault();
   const fd = new FormData(e.target);
   try {
     const r = await api("/api/login", { body: { username: fd.get("username"), password: fd.get("password") } });
-    TOKEN = r.token; localStorage.setItem("token", TOKEN); $("#loginErr").textContent = ""; e.target.reset(); start();
+    TOKEN = r.token; store.set("token", TOKEN); $("#loginErr").textContent = ""; e.target.reset(); start();
   } catch (err) { $("#loginErr").textContent = err.message; }
 };
 function changePassword(forced) {
@@ -330,9 +341,7 @@ function takePayment(st) {
   { submit: "Přijmout a vystavit doklad" });
 }
 function printReceipt(p) {
-  const w = window.open("", "_blank", "width=420,height=560");
-  if (!w) return;
-  w.document.write(`<html><head><title>Doklad ${esc(p.receipt_no)}</title><style>body{font:14px system-ui;padding:20px}td{padding:4px 8px}</style></head><body>
+  const html = `
     <h2>Příjmový doklad č. ${esc(p.receipt_no)}</h2>
     <table><tr><td>Objekt</td><td>${esc(propName(p.property_id))}</td></tr><tr><td>Datum</td><td>${dt(p.date)}</td></tr>
     <tr><td>Druh</td><td>${KIND[p.kind]}</td></tr><tr><td>Způsob</td><td>${METHOD[p.method]}</td></tr>
@@ -340,7 +349,11 @@ function printReceipt(p) {
     <tr><td>Přijal</td><td>${esc(ME.name)}</td></tr></table>
     <p style="margin-top:40px">Podpis plátce: ____________ &nbsp; Podpis příjemce: ____________</p>
     <p style="font-size:11px;color:#666">Doklad je evidován v systému a nelze jej smazat. Na každou platbu musí být vystaven doklad.</p>
-    <script>print()<\/script></body></html>`);
+`;
+  const w = window.DEMO_API ? null : window.open("", "_blank", "width=420,height=560");
+  if (w) { w.document.write(`<html><head><title>Doklad ${esc(p.receipt_no)}</title><style>body{font:14px system-ui;padding:20px}td{padding:4px 8px}</style></head><body>${html}<script>print()<\/script></body></html>`); return; }
+  $("#modalBody").innerHTML = `<div class="receipt">${html}</div><div class="row" style="margin-top:12px"><button class="btn primary" onclick="closeModal()">Zavřít</button></div>`;
+  $("#modal").classList.remove("hidden");
 }
 
 // ---------------------------------------------------------------- persons
@@ -534,7 +547,8 @@ async function viewAudit(v) {
     const gaps = r.receipt_gaps?.length ? ` POZOR: chybí čísla dokladů: ${r.receipt_gaps.map(g => g.year + ": " + g.missing.join(", ")).join("; ")}` : " Řada dokladů je souvislá.";
     $("#verifyRes").innerHTML = r.ok ? `<div class="alert ok">Záznamy jsou neporušené (${r.checked} záznamů ověřeno).${esc(gaps)}<br><span class="small">Kontrolní otisk: <code>${esc(r.last_hash)}</code> – poznamenejte si ho; pokud ho příště nenajdete v historii, data byla podvržena.</span></div>`
       : `<div class="alert bad">NARUŠENO! Záznam č. ${r.broken_at} byl změněn mimo systém. Data mohla být zfalšována – obnovte zálohu a prověřte, kdo měl přístup k počítači.</div>`;
-  }, "primary"], ["Zálohovat databázi", async () => { const r = await api("/api/backup"); toast("Záloha uložena: " + r.file, 7000); }]]);
+  }, "primary"], ["Zálohovat databázi", async () => { const r = await api("/api/backup"); toast("Záloha uložena: " + r.file, 7000); }],
+    ...(window.DEMO_API ? [["Simulovat podvod v databázi", async () => { toast((await api("/api/demo/tamper", { body: {} })).message, 8000); }, "danger"]] : [])]);
   v.innerHTML = `<div id="verifyRes"></div>
     <p class="muted">Kompletní neměnitelná historie všech akcí. Každý záznam je kryptograficky svázaný s předchozím – smazání nebo změna kteréhokoli z nich se při ověření odhalí.</p>
     <div class="row mb"><input id="aq" placeholder="Hledat (akce, uživatel, obsah)…" value="${esc(term)}" style="padding:7px 9px;border:1px solid var(--line);border-radius:7px;min-width:260px;background:var(--card);color:var(--ink)"></div>
