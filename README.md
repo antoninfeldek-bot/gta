@@ -44,3 +44,10 @@ Potřebuješ klávesnici a myš. Pro načtení Three.js je nutné připojení k 
 | G | zapnout/vypnout stíny (výkon) |
 | ← → | otáčení kamery bez myši |
 | Esc / P | pauza |
+
+---
+
+## Správa ubytování
+
+Ve složce [`sprava-ubytovani/`](sprava-ubytovani/) je samostatný program pro správu ubytovny,
+hotelu a bytů. Návod je v [`sprava-ubytovani/README.md`](sprava-ubytovani/README.md).

@@ -1,0 +1,7 @@
+data.db
+data.db-*
+zalohy/
+__pycache__/
+build/
+dist/
+*.spec

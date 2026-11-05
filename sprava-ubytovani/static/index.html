@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Správa ubytování</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div id="login" class="login hidden">
+  <form id="loginForm" class="card login-card">
+    <h1>Správa ubytování</h1>
+    <label>Uživatel<input name="username" autocomplete="username" required></label>
+    <label>Heslo<input name="password" type="password" autocomplete="current-password" required></label>
+    <button class="btn primary">Přihlásit</button>
+    <p class="muted small">První spuštění: <b>majitel</b> / <b>majitel</b> – systém si hned vyžádá nové heslo.</p>
+    <p id="loginErr" class="err"></p>
+  </form>
+</div>
+
+<div id="app" class="hidden">
+  <aside class="side">
+    <div class="brand">Správa ubytování</div>
+    <nav id="nav"></nav>
+    <div class="who" id="who"></div>
+  </aside>
+  <main>
+    <header class="top"><button class="btn ghost menu" id="menuBtn">☰</button><h2 id="title"></h2><div id="actions"></div></header>
+    <section id="view"></section>
+  </main>
+</div>
+
+<div id="modal" class="modal hidden"><div class="modal-box card"><div id="modalBody"></div></div></div>
+<div id="toast" class="toast hidden"></div>
+<script src="/app.js"></script>
+</body>
+</html>
