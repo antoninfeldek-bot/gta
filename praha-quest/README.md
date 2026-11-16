@@ -16,7 +16,7 @@ QR kód naskenuj v **Expo Go** (projekt je na Expo SDK 58, Expo Go musí být ak
 
 ## Webová verze
 
-Stejná hra běží i v prohlížeči a na mobilu vypadá stejně. Na širokém monitoru se drží šířky telefonu. Místo nativní mapy používá [MapLibre](https://maplibre.org/) s tmavým podkladem z OpenStreetMap (CARTO). Poloha jde z prohlížeče, kroky se počítají z GPS a testovací chůze funguje stejně.
+Stejná hra běží i v prohlížeči a na mobilu vypadá stejně. Na širokém monitoru se drží šířky telefonu. Místo nativní mapy používá [MapLibre](https://maplibre.org/) s vlastním nočním stylem nad dlaždicemi OpenFreeMap (data OpenStreetMap, bez API klíče). Poloha jde z prohlížeče, kroky se počítají z GPS a testovací chůze funguje stejně.
 
 ```bash
 npx expo start --web        # vývoj na počítači

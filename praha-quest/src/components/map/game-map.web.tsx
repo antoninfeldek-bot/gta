@@ -14,22 +14,20 @@ import { color, font, rarityColor } from '@/theme';
 import { computeFog, quantizeRegion, type LatLng, type Region } from '@/utils/fog';
 import { PLACE_GLYPH, PRAGUE_REGION, visiblePlaces } from '@/utils/places';
 import type { GameMapHandle, GameMapProps } from './game-map.types';
-
-/** Dark raster basemap from OpenStreetMap data, tinted toward the game palette. */
-const BASEMAP_TILES = ['a', 'b', 'c', 'd'].map((s) => `https://${s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png`);
-const ATTRIBUTION = '© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> © <a href="https://carto.com/attributions" target="_blank">CARTO</a>';
+import { BASEMAP_LAYERS, BASEMAP_SOURCE, GLYPHS } from './web-map-style';
 
 const STYLE: maplibregl.StyleSpecification = {
   version: 8,
+  glyphs: GLYPHS,
   sources: {
-    basemap: { type: 'raster', tiles: BASEMAP_TILES, tileSize: 256, maxzoom: 19, attribution: ATTRIBUTION },
+    basemap: BASEMAP_SOURCE,
     fog: { type: 'geojson', data: emptyFc() },
     grid: { type: 'geojson', data: emptyFc() },
     shores: { type: 'geojson', data: emptyFc() },
   },
   layers: [
     { id: 'bg', type: 'background', paint: { 'background-color': color.night } },
-    { id: 'basemap', type: 'raster', source: 'basemap', paint: { 'raster-opacity': 0.9, 'raster-saturation': -0.4, 'raster-contrast': 0.1 } },
+    ...BASEMAP_LAYERS,
     { id: 'grid', type: 'line', source: 'grid', paint: { 'line-color': 'rgba(226,177,77,0.12)', 'line-width': 1 } },
     { id: 'fog', type: 'fill', source: 'fog', paint: { 'fill-color': color.fog, 'fill-antialias': false } },
     { id: 'shores-fill', type: 'fill', source: 'shores', paint: { 'fill-color': 'rgba(111,183,160,0.06)' } },
