@@ -1,0 +1,1261 @@
+{
+ "generatedAt": "2026-11-16T22:06:16.390Z",
+ "source": "seed: metro from PID timetable data (via krystxf/metro-now, MPL-2.0); landmarks hand-entered — replace with `npm run fetch-places`",
+ "places": [
+  {
+   "id": "metro-andel",
+   "nameCs": "Anděl",
+   "type": "metro",
+   "lat": 50.07126,
+   "lng": 14.4033651,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-borislavka",
+   "nameCs": "Bořislavka",
+   "type": "metro",
+   "lat": 50.09862,
+   "lng": 14.36417,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-budejovicka",
+   "nameCs": "Budějovická",
+   "type": "metro",
+   "lat": 50.0448837,
+   "lng": 14.4482613,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-cechuv-most",
+   "nameCs": "Čechův most",
+   "type": "bridge",
+   "lat": 50.0928,
+   "lng": 14.417,
+   "district": "Praha 1",
+   "rarity": "rare"
+  },
+  {
+   "id": "metro-cerny-most",
+   "nameCs": "Černý Most",
+   "type": "metro",
+   "lat": 50.10898,
+   "lng": 14.5774412,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-ceskomoravska",
+   "nameCs": "Českomoravská",
+   "type": "metro",
+   "lat": 50.1059647,
+   "lng": 14.4922371,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-dejvicka",
+   "nameCs": "Dejvická",
+   "type": "metro",
+   "lat": 50.1009,
+   "lng": 14.393199,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-depo-hostivar",
+   "nameCs": "Depo Hostivař",
+   "type": "metro",
+   "lat": 50.07664,
+   "lng": 14.5167828,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-flora",
+   "nameCs": "Flora",
+   "type": "metro",
+   "lat": 50.0781326,
+   "lng": 14.4617405,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-florenc",
+   "nameCs": "Florenc",
+   "type": "metro",
+   "lat": 50.0905075,
+   "lng": 14.438818,
+   "district": "Praha",
+   "rarity": "rare"
+  },
+  {
+   "id": "metro-haje",
+   "nameCs": "Háje",
+   "type": "metro",
+   "lat": 50.0305176,
+   "lng": 14.5269022,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-hanavsky-pavilon",
+   "nameCs": "Hanavský pavilon",
+   "type": "viewpoint",
+   "lat": 50.0932,
+   "lng": 14.4142,
+   "district": "Praha 7",
+   "rarity": "rare"
+  },
+  {
+   "id": "seed-havlickovy-sady",
+   "nameCs": "Havlíčkovy sady",
+   "type": "park",
+   "lat": 50.069,
+   "lng": 14.445,
+   "district": "Praha 2",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-hlavkuv-most",
+   "nameCs": "Hlávkův most",
+   "type": "bridge",
+   "lat": 50.0975,
+   "lng": 14.4327,
+   "district": "Praha 7",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-hlavni-nadrazi",
+   "nameCs": "Hlavní nádraží",
+   "type": "metro",
+   "lat": 50.0838,
+   "lng": 14.4347754,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-hloubetin",
+   "nameCs": "Hloubětín",
+   "type": "metro",
+   "lat": 50.1062622,
+   "lng": 14.5371313,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-hradcanska",
+   "nameCs": "Hradčanská",
+   "type": "metro",
+   "lat": 50.0975037,
+   "lng": 14.4043093,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-hurka",
+   "nameCs": "Hůrka",
+   "type": "metro",
+   "lat": 50.0496368,
+   "lng": 14.3416481,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-chodov",
+   "nameCs": "Chodov",
+   "type": "metro",
+   "lat": 50.03112,
+   "lng": 14.4914255,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-i-p-pavlova",
+   "nameCs": "I. P. Pavlova",
+   "type": "metro",
+   "lat": 50.07518,
+   "lng": 14.4305162,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-invalidovna",
+   "nameCs": "Invalidovna",
+   "type": "metro",
+   "lat": 50.097393,
+   "lng": 14.4643278,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-jindrisska-vez",
+   "nameCs": "Jindřišská věž",
+   "type": "tower",
+   "lat": 50.0846,
+   "lng": 14.4316,
+   "district": "Praha 1",
+   "rarity": "rare"
+  },
+  {
+   "id": "metro-jinonice",
+   "nameCs": "Jinonice",
+   "type": "metro",
+   "lat": 50.0544548,
+   "lng": 14.3706169,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-jiraskuv-most",
+   "nameCs": "Jiráskův most",
+   "type": "bridge",
+   "lat": 50.0748,
+   "lng": 14.412,
+   "district": "Praha 2",
+   "rarity": "rare"
+  },
+  {
+   "id": "metro-jiriho-z-podebrad",
+   "nameCs": "Jiřího z Poděbrad",
+   "type": "metro",
+   "lat": 50.0775261,
+   "lng": 14.44971,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-kacerov",
+   "nameCs": "Kačerov",
+   "type": "metro",
+   "lat": 50.0418549,
+   "lng": 14.4603252,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-kampa",
+   "nameCs": "Kampa",
+   "type": "park",
+   "lat": 50.0845,
+   "lng": 14.408,
+   "district": "Praha 1",
+   "rarity": "rare"
+  },
+  {
+   "id": "metro-karlovo-namesti",
+   "nameCs": "Karlovo náměstí",
+   "type": "metro",
+   "lat": 50.07529,
+   "lng": 14.4185162,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-karluv-most",
+   "nameCs": "Karlův most",
+   "type": "bridge",
+   "lat": 50.0865,
+   "lng": 14.4114,
+   "district": "Praha 1",
+   "rarity": "legendary"
+  },
+  {
+   "id": "seed-katedrala-svateho-vita",
+   "nameCs": "Katedrála svatého Víta",
+   "type": "church",
+   "lat": 50.0909,
+   "lng": 14.4005,
+   "district": "Praha 1",
+   "rarity": "legendary"
+  },
+  {
+   "id": "seed-klementinum",
+   "nameCs": "Klementinum",
+   "type": "landmark",
+   "lat": 50.0864,
+   "lng": 14.4163,
+   "district": "Praha 1",
+   "rarity": "epic"
+  },
+  {
+   "id": "metro-kobylisy",
+   "nameCs": "Kobylisy",
+   "type": "metro",
+   "lat": 50.12433,
+   "lng": 14.4544983,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-kolbenova",
+   "nameCs": "Kolbenova",
+   "type": "metro",
+   "lat": 50.11049,
+   "lng": 14.5162048,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-kostel-panny-marie-vitezne",
+   "nameCs": "Kostel Panny Marie Vítězné",
+   "type": "church",
+   "lat": 50.086,
+   "lng": 14.4038,
+   "district": "Praha 1",
+   "rarity": "rare"
+  },
+  {
+   "id": "seed-kostel-svateho-mikulase",
+   "nameCs": "Kostel svatého Mikuláše",
+   "type": "church",
+   "lat": 50.088,
+   "lng": 14.4035,
+   "district": "Praha 1",
+   "rarity": "epic"
+  },
+  {
+   "id": "metro-krizikova",
+   "nameCs": "Křižíkova",
+   "type": "metro",
+   "lat": 50.09329,
+   "lng": 14.4513893,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-ladvi",
+   "nameCs": "Ládví",
+   "type": "metro",
+   "lat": 50.12643,
+   "lng": 14.4697676,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-lennonova-zed",
+   "nameCs": "Lennonova zeď",
+   "type": "landmark",
+   "lat": 50.0862,
+   "lng": 14.4067,
+   "district": "Praha 1",
+   "rarity": "epic"
+  },
+  {
+   "id": "seed-letenske-sady",
+   "nameCs": "Letenské sady",
+   "type": "park",
+   "lat": 50.0957,
+   "lng": 14.4225,
+   "district": "Praha 7",
+   "rarity": "rare"
+  },
+  {
+   "id": "metro-letnany",
+   "nameCs": "Letňany",
+   "type": "metro",
+   "lat": 50.1256142,
+   "lng": 14.51615,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-letohradek-hvezda",
+   "nameCs": "Letohrádek Hvězda",
+   "type": "landmark",
+   "lat": 50.0838,
+   "lng": 14.3291,
+   "district": "Praha 6",
+   "rarity": "rare"
+  },
+  {
+   "id": "seed-loreta",
+   "nameCs": "Loreta",
+   "type": "church",
+   "lat": 50.089,
+   "lng": 14.3918,
+   "district": "Praha 1",
+   "rarity": "epic"
+  },
+  {
+   "id": "metro-luka",
+   "nameCs": "Luka",
+   "type": "metro",
+   "lat": 50.0454369,
+   "lng": 14.3213024,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-luziny",
+   "nameCs": "Lužiny",
+   "type": "metro",
+   "lat": 50.0444946,
+   "lng": 14.3304424,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-malostranska",
+   "nameCs": "Malostranská",
+   "type": "metro",
+   "lat": 50.09125,
+   "lng": 14.4099207,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-malostranska-mostecka-vez",
+   "nameCs": "Malostranská mostecká věž",
+   "type": "tower",
+   "lat": 50.087,
+   "lng": 14.406,
+   "district": "Praha 1",
+   "rarity": "epic"
+  },
+  {
+   "id": "seed-manesuv-most",
+   "nameCs": "Mánesův most",
+   "type": "bridge",
+   "lat": 50.0893,
+   "lng": 14.4135,
+   "district": "Praha 1",
+   "rarity": "rare"
+  },
+  {
+   "id": "seed-metronom",
+   "nameCs": "Metronom",
+   "type": "viewpoint",
+   "lat": 50.095,
+   "lng": 14.4158,
+   "district": "Praha 7",
+   "rarity": "epic"
+  },
+  {
+   "id": "seed-most-legii",
+   "nameCs": "Most Legií",
+   "type": "bridge",
+   "lat": 50.0812,
+   "lng": 14.4114,
+   "district": "Praha 1",
+   "rarity": "rare"
+  },
+  {
+   "id": "seed-museum-kampa",
+   "nameCs": "Museum Kampa",
+   "type": "museum",
+   "lat": 50.0841,
+   "lng": 14.4093,
+   "district": "Praha 1",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-mustek",
+   "nameCs": "Můstek",
+   "type": "metro",
+   "lat": 50.08347,
+   "lng": 14.4239731,
+   "district": "Praha",
+   "rarity": "rare"
+  },
+  {
+   "id": "metro-muzeum",
+   "nameCs": "Muzeum",
+   "type": "metro",
+   "lat": 50.07953,
+   "lng": 14.4318123,
+   "district": "Praha",
+   "rarity": "rare"
+  },
+  {
+   "id": "seed-muzeum-hlavniho-mesta-prahy",
+   "nameCs": "Muzeum hlavního města Prahy",
+   "type": "museum",
+   "lat": 50.091,
+   "lng": 14.434,
+   "district": "Praha 8",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-nadrazi-holesovice",
+   "nameCs": "Nádraží Holešovice",
+   "type": "metro",
+   "lat": 50.10902,
+   "lng": 14.4394522,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-nadrazi-veleslavin",
+   "nameCs": "Nádraží Veleslavín",
+   "type": "metro",
+   "lat": 50.095726,
+   "lng": 14.3468428,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-namesti-miru",
+   "nameCs": "Náměstí Míru",
+   "type": "metro",
+   "lat": 50.07506,
+   "lng": 14.4380789,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-namesti-republiky",
+   "nameCs": "Náměstí Republiky",
+   "type": "metro",
+   "lat": 50.0889244,
+   "lng": 14.429677,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-narodni-divadlo",
+   "nameCs": "Národní divadlo",
+   "type": "landmark",
+   "lat": 50.081,
+   "lng": 14.4134,
+   "district": "Praha 1",
+   "rarity": "legendary"
+  },
+  {
+   "id": "seed-narodni-muzeum",
+   "nameCs": "Národní muzeum",
+   "type": "museum",
+   "lat": 50.079,
+   "lng": 14.4307,
+   "district": "Praha 1",
+   "rarity": "legendary"
+  },
+  {
+   "id": "seed-narodni-pamatnik-na-vitkove",
+   "nameCs": "Národní památník na Vítkově",
+   "type": "landmark",
+   "lat": 50.0879,
+   "lng": 14.4491,
+   "district": "Praha 3",
+   "rarity": "epic"
+  },
+  {
+   "id": "seed-narodni-technicke-muzeum",
+   "nameCs": "Národní technické muzeum",
+   "type": "museum",
+   "lat": 50.0974,
+   "lng": 14.4252,
+   "district": "Praha 7",
+   "rarity": "rare"
+  },
+  {
+   "id": "metro-narodni-trida",
+   "nameCs": "Národní třída",
+   "type": "metro",
+   "lat": 50.0805855,
+   "lng": 14.41992,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-nemocnice-motol",
+   "nameCs": "Nemocnice Motol",
+   "type": "metro",
+   "lat": 50.0749741,
+   "lng": 14.3407869,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-nove-butovice",
+   "nameCs": "Nové Butovice",
+   "type": "metro",
+   "lat": 50.0509758,
+   "lng": 14.3522758,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-nuselsky-most",
+   "nameCs": "Nuselský most",
+   "type": "bridge",
+   "lat": 50.066,
+   "lng": 14.4291,
+   "district": "Praha 2",
+   "rarity": "rare"
+  },
+  {
+   "id": "seed-obecni-dum",
+   "nameCs": "Obecní dům",
+   "type": "landmark",
+   "lat": 50.0877,
+   "lng": 14.428,
+   "district": "Praha 1",
+   "rarity": "legendary"
+  },
+  {
+   "id": "metro-opatov",
+   "nameCs": "Opatov",
+   "type": "metro",
+   "lat": 50.0276947,
+   "lng": 14.5084009,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-palackeho-most",
+   "nameCs": "Palackého most",
+   "type": "bridge",
+   "lat": 50.072,
+   "lng": 14.4133,
+   "district": "Praha 2",
+   "rarity": "rare"
+  },
+  {
+   "id": "metro-palmovka",
+   "nameCs": "Palmovka",
+   "type": "metro",
+   "lat": 50.1038132,
+   "lng": 14.4749022,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-pankrac",
+   "nameCs": "Pankrác",
+   "type": "metro",
+   "lat": 50.0511665,
+   "lng": 14.4392538,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-petrinska-rozhledna",
+   "nameCs": "Petřínská rozhledna",
+   "type": "tower",
+   "lat": 50.0835,
+   "lng": 14.3951,
+   "district": "Praha 1",
+   "rarity": "legendary"
+  },
+  {
+   "id": "seed-petrinske-sady",
+   "nameCs": "Petřínské sady",
+   "type": "park",
+   "lat": 50.083,
+   "lng": 14.399,
+   "district": "Praha 1",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-petriny",
+   "nameCs": "Petřiny",
+   "type": "metro",
+   "lat": 50.0875053,
+   "lng": 14.344923,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-prasna-brana",
+   "nameCs": "Prašná brána",
+   "type": "tower",
+   "lat": 50.0865,
+   "lng": 14.4274,
+   "district": "Praha 1",
+   "rarity": "epic"
+  },
+  {
+   "id": "metro-prazskeho-povstani",
+   "nameCs": "Pražského povstání",
+   "type": "metro",
+   "lat": 50.05617,
+   "lng": 14.43422,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-prazsky-hrad",
+   "nameCs": "Pražský hrad",
+   "type": "landmark",
+   "lat": 50.0899,
+   "lng": 14.3983,
+   "district": "Praha 1",
+   "rarity": "legendary"
+  },
+  {
+   "id": "metro-prosek",
+   "nameCs": "Prosek",
+   "type": "metro",
+   "lat": 50.1192856,
+   "lng": 14.4982214,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-radlicka",
+   "nameCs": "Radlická",
+   "type": "metro",
+   "lat": 50.0584869,
+   "lng": 14.3888187,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-rajska-zahrada",
+   "nameCs": "Rajská zahrada",
+   "type": "metro",
+   "lat": 50.1065674,
+   "lng": 14.5598669,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-riegrovy-sady",
+   "nameCs": "Riegrovy sady",
+   "type": "park",
+   "lat": 50.079,
+   "lng": 14.4415,
+   "district": "Praha 2",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-rotunda-svateho-martina",
+   "nameCs": "Rotunda svatého Martina",
+   "type": "church",
+   "lat": 50.0628,
+   "lng": 14.4195,
+   "district": "Praha 2",
+   "rarity": "rare"
+  },
+  {
+   "id": "metro-roztyly",
+   "nameCs": "Roztyly",
+   "type": "metro",
+   "lat": 50.0376625,
+   "lng": 14.477663,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-rudolfinum",
+   "nameCs": "Rudolfinum",
+   "type": "landmark",
+   "lat": 50.09,
+   "lng": 14.4153,
+   "district": "Praha 1",
+   "rarity": "epic"
+  },
+  {
+   "id": "metro-skalka",
+   "nameCs": "Skalka",
+   "type": "metro",
+   "lat": 50.068222,
+   "lng": 14.5077934,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-smichovske-nadrazi",
+   "nameCs": "Smíchovské nádraží",
+   "type": "metro",
+   "lat": 50.06086,
+   "lng": 14.4091272,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-staromestska",
+   "nameCs": "Staroměstská",
+   "type": "metro",
+   "lat": 50.0886536,
+   "lng": 14.4163837,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-staromestska-mostecka-vez",
+   "nameCs": "Staroměstská mostecká věž",
+   "type": "tower",
+   "lat": 50.0862,
+   "lng": 14.4136,
+   "district": "Praha 1",
+   "rarity": "epic"
+  },
+  {
+   "id": "seed-staromestske-namesti",
+   "nameCs": "Staroměstské náměstí",
+   "type": "landmark",
+   "lat": 50.0875,
+   "lng": 14.4213,
+   "district": "Praha 1",
+   "rarity": "legendary"
+  },
+  {
+   "id": "seed-staromestsky-orloj",
+   "nameCs": "Staroměstský orloj",
+   "type": "landmark",
+   "lat": 50.087,
+   "lng": 14.4207,
+   "district": "Praha 1",
+   "rarity": "legendary"
+  },
+  {
+   "id": "seed-staronova-synagoga",
+   "nameCs": "Staronová synagoga",
+   "type": "church",
+   "lat": 50.0903,
+   "lng": 14.4189,
+   "district": "Praha 1",
+   "rarity": "epic"
+  },
+  {
+   "id": "metro-stodulky",
+   "nameCs": "Stodůlky",
+   "type": "metro",
+   "lat": 50.0466423,
+   "lng": 14.307148,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-strahovsky-klaster",
+   "nameCs": "Strahovský klášter",
+   "type": "landmark",
+   "lat": 50.0863,
+   "lng": 14.3894,
+   "district": "Praha 1",
+   "rarity": "epic"
+  },
+  {
+   "id": "metro-strasnicka",
+   "nameCs": "Strašnická",
+   "type": "metro",
+   "lat": 50.0726929,
+   "lng": 14.4910736,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-stromovka",
+   "nameCs": "Stromovka",
+   "type": "park",
+   "lat": 50.1045,
+   "lng": 14.418,
+   "district": "Praha 7",
+   "rarity": "rare"
+  },
+  {
+   "id": "metro-strizkov",
+   "nameCs": "Střížkov",
+   "type": "metro",
+   "lat": 50.1263466,
+   "lng": 14.4892445,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-tancici-dum",
+   "nameCs": "Tančící dům",
+   "type": "landmark",
+   "lat": 50.0755,
+   "lng": 14.4141,
+   "district": "Praha 2",
+   "rarity": "legendary"
+  },
+  {
+   "id": "seed-trojsky-zamek",
+   "nameCs": "Trojský zámek",
+   "type": "landmark",
+   "lat": 50.1162,
+   "lng": 14.4115,
+   "district": "Praha 7",
+   "rarity": "rare"
+  },
+  {
+   "id": "seed-tynsky-chram",
+   "nameCs": "Týnský chrám",
+   "type": "church",
+   "lat": 50.0877,
+   "lng": 14.4228,
+   "district": "Praha 1",
+   "rarity": "epic"
+  },
+  {
+   "id": "seed-umeleckoprumyslove-museum",
+   "nameCs": "Uměleckoprůmyslové museum",
+   "type": "museum",
+   "lat": 50.0895,
+   "lng": 14.4166,
+   "district": "Praha 1",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-vaclavske-namesti",
+   "nameCs": "Václavské náměstí",
+   "type": "landmark",
+   "lat": 50.0814,
+   "lng": 14.428,
+   "district": "Praha 1",
+   "rarity": "legendary"
+  },
+  {
+   "id": "seed-valdstejnska-zahrada",
+   "nameCs": "Valdštejnská zahrada",
+   "type": "park",
+   "lat": 50.0898,
+   "lng": 14.407,
+   "district": "Praha 1",
+   "rarity": "rare"
+  },
+  {
+   "id": "seed-veletrzni-palac",
+   "nameCs": "Veletržní palác",
+   "type": "museum",
+   "lat": 50.1015,
+   "lng": 14.4335,
+   "district": "Praha 7",
+   "rarity": "rare"
+  },
+  {
+   "id": "metro-vltavska",
+   "nameCs": "Vltavská",
+   "type": "metro",
+   "lat": 50.0988846,
+   "lng": 14.4383736,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-vyhlidka-u-strahovskeho-klastera",
+   "nameCs": "Vyhlídka u Strahovského kláštera",
+   "type": "viewpoint",
+   "lat": 50.0858,
+   "lng": 14.3916,
+   "district": "Praha 1",
+   "rarity": "rare"
+  },
+  {
+   "id": "seed-vyhlidka-v-riegrovych-sadech",
+   "nameCs": "Vyhlídka v Riegrových sadech",
+   "type": "viewpoint",
+   "lat": 50.0782,
+   "lng": 14.443,
+   "district": "Praha 2",
+   "rarity": "rare"
+  },
+  {
+   "id": "metro-vysocanska",
+   "nameCs": "Vysočanská",
+   "type": "metro",
+   "lat": 50.11072,
+   "lng": 14.5022192,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "metro-vysehrad",
+   "nameCs": "Vyšehrad",
+   "type": "metro",
+   "lat": 50.06116,
+   "lng": 14.4305353,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-vysehrad",
+   "nameCs": "Vyšehrad",
+   "type": "landmark",
+   "lat": 50.0646,
+   "lng": 14.4175,
+   "district": "Praha 2",
+   "rarity": "legendary"
+  },
+  {
+   "id": "seed-zlata-ulicka",
+   "nameCs": "Zlatá ulička",
+   "type": "landmark",
+   "lat": 50.0921,
+   "lng": 14.404,
+   "district": "Praha 1",
+   "rarity": "epic"
+  },
+  {
+   "id": "metro-zlicin",
+   "nameCs": "Zličín",
+   "type": "metro",
+   "lat": 50.0546761,
+   "lng": 14.2901535,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-zoologicka-zahrada-praha",
+   "nameCs": "Zoologická zahrada Praha",
+   "type": "park",
+   "lat": 50.117,
+   "lng": 14.406,
+   "district": "Praha 7",
+   "rarity": "rare"
+  },
+  {
+   "id": "metro-zelivskeho",
+   "nameCs": "Želivského",
+   "type": "metro",
+   "lat": 50.0785637,
+   "lng": 14.4737558,
+   "district": "Praha",
+   "rarity": "common"
+  },
+  {
+   "id": "seed-zizkovsky-vysilac",
+   "nameCs": "Žižkovský vysílač",
+   "type": "tower",
+   "lat": 50.081,
+   "lng": 14.451,
+   "district": "Praha 3",
+   "rarity": "legendary"
+  }
+ ],
+ "sets": [
+  {
+   "id": "metro-all",
+   "nameCs": "Všechny stanice metra",
+   "placeIds": [
+    "metro-andel",
+    "metro-borislavka",
+    "metro-budejovicka",
+    "metro-cerny-most",
+    "metro-ceskomoravska",
+    "metro-dejvicka",
+    "metro-depo-hostivar",
+    "metro-flora",
+    "metro-florenc",
+    "metro-haje",
+    "metro-hlavni-nadrazi",
+    "metro-hloubetin",
+    "metro-hradcanska",
+    "metro-hurka",
+    "metro-chodov",
+    "metro-i-p-pavlova",
+    "metro-invalidovna",
+    "metro-jinonice",
+    "metro-jiriho-z-podebrad",
+    "metro-kacerov",
+    "metro-karlovo-namesti",
+    "metro-kobylisy",
+    "metro-kolbenova",
+    "metro-krizikova",
+    "metro-ladvi",
+    "metro-letnany",
+    "metro-luka",
+    "metro-luziny",
+    "metro-malostranska",
+    "metro-mustek",
+    "metro-muzeum",
+    "metro-nadrazi-holesovice",
+    "metro-nadrazi-veleslavin",
+    "metro-namesti-miru",
+    "metro-namesti-republiky",
+    "metro-narodni-trida",
+    "metro-nemocnice-motol",
+    "metro-nove-butovice",
+    "metro-opatov",
+    "metro-palmovka",
+    "metro-pankrac",
+    "metro-petriny",
+    "metro-prazskeho-povstani",
+    "metro-prosek",
+    "metro-radlicka",
+    "metro-rajska-zahrada",
+    "metro-roztyly",
+    "metro-skalka",
+    "metro-smichovske-nadrazi",
+    "metro-staromestska",
+    "metro-stodulky",
+    "metro-strasnicka",
+    "metro-strizkov",
+    "metro-vltavska",
+    "metro-vysocanska",
+    "metro-vysehrad",
+    "metro-zlicin",
+    "metro-zelivskeho"
+   ]
+  },
+  {
+   "id": "metro-a",
+   "nameCs": "Linka A",
+   "placeIds": [
+    "metro-borislavka",
+    "metro-dejvicka",
+    "metro-depo-hostivar",
+    "metro-flora",
+    "metro-hradcanska",
+    "metro-jiriho-z-podebrad",
+    "metro-malostranska",
+    "metro-mustek",
+    "metro-muzeum",
+    "metro-nadrazi-veleslavin",
+    "metro-namesti-miru",
+    "metro-nemocnice-motol",
+    "metro-petriny",
+    "metro-skalka",
+    "metro-staromestska",
+    "metro-strasnicka",
+    "metro-zelivskeho"
+   ]
+  },
+  {
+   "id": "metro-b",
+   "nameCs": "Linka B",
+   "placeIds": [
+    "metro-andel",
+    "metro-cerny-most",
+    "metro-ceskomoravska",
+    "metro-florenc",
+    "metro-hloubetin",
+    "metro-hurka",
+    "metro-invalidovna",
+    "metro-jinonice",
+    "metro-karlovo-namesti",
+    "metro-kolbenova",
+    "metro-krizikova",
+    "metro-luka",
+    "metro-luziny",
+    "metro-mustek",
+    "metro-namesti-republiky",
+    "metro-narodni-trida",
+    "metro-nove-butovice",
+    "metro-palmovka",
+    "metro-radlicka",
+    "metro-rajska-zahrada",
+    "metro-smichovske-nadrazi",
+    "metro-stodulky",
+    "metro-vysocanska",
+    "metro-zlicin"
+   ]
+  },
+  {
+   "id": "metro-c",
+   "nameCs": "Linka C",
+   "placeIds": [
+    "metro-budejovicka",
+    "metro-florenc",
+    "metro-haje",
+    "metro-hlavni-nadrazi",
+    "metro-chodov",
+    "metro-i-p-pavlova",
+    "metro-kacerov",
+    "metro-kobylisy",
+    "metro-ladvi",
+    "metro-letnany",
+    "metro-muzeum",
+    "metro-nadrazi-holesovice",
+    "metro-opatov",
+    "metro-pankrac",
+    "metro-prazskeho-povstani",
+    "metro-prosek",
+    "metro-roztyly",
+    "metro-strizkov",
+    "metro-vltavska",
+    "metro-vysehrad"
+   ]
+  },
+  {
+   "id": "bridges",
+   "nameCs": "Mosty",
+   "placeIds": [
+    "seed-cechuv-most",
+    "seed-hlavkuv-most",
+    "seed-jiraskuv-most",
+    "seed-karluv-most",
+    "seed-manesuv-most",
+    "seed-most-legii",
+    "seed-nuselsky-most",
+    "seed-palackeho-most"
+   ]
+  },
+  {
+   "id": "viewpoints",
+   "nameCs": "Vyhlídky",
+   "placeIds": [
+    "seed-hanavsky-pavilon",
+    "seed-metronom",
+    "seed-vyhlidka-u-strahovskeho-klastera",
+    "seed-vyhlidka-v-riegrovych-sadech"
+   ]
+  },
+  {
+   "id": "towers",
+   "nameCs": "Pražské věže",
+   "placeIds": [
+    "seed-jindrisska-vez",
+    "seed-malostranska-mostecka-vez",
+    "seed-petrinska-rozhledna",
+    "seed-prasna-brana",
+    "seed-staromestska-mostecka-vez",
+    "seed-zizkovsky-vysilac"
+   ]
+  },
+  {
+   "id": "museums",
+   "nameCs": "Muzea",
+   "placeIds": [
+    "seed-museum-kampa",
+    "seed-muzeum-hlavniho-mesta-prahy",
+    "seed-narodni-muzeum",
+    "seed-narodni-technicke-muzeum",
+    "seed-umeleckoprumyslove-museum",
+    "seed-veletrzni-palac"
+   ]
+  },
+  {
+   "id": "parks",
+   "nameCs": "Parky a zahrady",
+   "placeIds": [
+    "seed-havlickovy-sady",
+    "seed-kampa",
+    "seed-letenske-sady",
+    "seed-petrinske-sady",
+    "seed-riegrovy-sady",
+    "seed-stromovka",
+    "seed-valdstejnska-zahrada",
+    "seed-zoologicka-zahrada-praha"
+   ]
+  },
+  {
+   "id": "legends",
+   "nameCs": "Legendy Prahy",
+   "placeIds": [
+    "seed-karluv-most",
+    "seed-katedrala-svateho-vita",
+    "seed-narodni-divadlo",
+    "seed-narodni-muzeum",
+    "seed-obecni-dum",
+    "seed-petrinska-rozhledna",
+    "seed-prazsky-hrad",
+    "seed-staromestske-namesti",
+    "seed-staromestsky-orloj",
+    "seed-tancici-dum",
+    "seed-vaclavske-namesti",
+    "seed-vysehrad",
+    "seed-zizkovsky-vysilac"
+   ]
+  },
+  {
+   "id": "royal-route",
+   "nameCs": "Královská cesta",
+   "placeIds": [
+    "seed-prasna-brana",
+    "seed-staromestske-namesti",
+    "seed-klementinum",
+    "seed-karluv-most",
+    "seed-kostel-svateho-mikulase",
+    "seed-prazsky-hrad"
+   ]
+  }
+ ]
+}
