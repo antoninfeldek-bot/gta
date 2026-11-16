@@ -23,6 +23,8 @@ npx expo start --web        # vývoj na počítači
 npm run build:web           # statický web do složky dist/
 ```
 
+**Živá verze:** https://antoninfeldek-bot.github.io/gta/ (větev `gh-pages`, aktualizuje se pomocí `npm run build:pages` a pushnutím obsahu `dist/` do té větve).
+
 Složku `dist/` stačí nahrát na jakýkoli statický hosting, třeba přetažením na Netlify Drop, na GitHub Pages nebo na EAS Hosting. **Na mobilu musí web běžet přes https**, jinak prohlížeč polohu nepovolí. Bez https jde hrát jen testovací chůze.
 
 ## Příkazy

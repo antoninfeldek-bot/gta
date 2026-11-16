@@ -57,7 +57,8 @@
     "fetch-places": "NODE_USE_ENV_PROXY=1 tsx scripts/fetch-places.ts",
     "typecheck": "tsc --noEmit",
     "seed-places": "tsx scripts/build-seed-places.ts",
-    "build:web": "expo export --platform web --output-dir dist"
+    "build:web": "expo export --platform web --output-dir dist",
+    "build:pages": "WEB_BASE_URL=/gta expo export --platform web --output-dir dist && cp dist/index.html dist/404.html && touch dist/.nojekyll"
   },
   "private": true,
   "jest": {
