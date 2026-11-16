@@ -32,6 +32,8 @@ export const cs = {
     askButton: 'Povolit polohu',
     deniedTitle: 'Bez polohy mlha nezmizí',
     deniedBody: 'Polohu zapneš v nastavení telefonu u aplikace Expo Go. Nebo si zkus hru v testovací chůzi.',
+    deniedBodyWeb: 'Prohlížeč polohu nepovolil. Zapni ji u téhle stránky v nastavení prohlížeče (na mobilu stránka musí běžet přes https), nebo si hru zkus v testovací chůzi.',
+    trySimulation: 'Zkusit testovací chůzi',
     openSettings: 'Otevřít nastavení',
     searching: 'Hledám tě na mapě…',
     weakSignal: 'Slabý signál GPS — počkej chvilku na volném prostranství.',

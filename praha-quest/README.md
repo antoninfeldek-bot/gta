@@ -14,10 +14,22 @@ QR kód naskenuj v **Expo Go** (projekt je na Expo SDK 58, Expo Go musí být ak
 
 **Nejsi v Praze?** V záložce *Hrdina* zapni **Testovací chůze**. Pak ťukni kamkoli na mapu a postava tam dojde rychlostí chůze (5 km/h). Odkrývá mlhu, počítá kroky a u místa můžeš dát *Zabrat místo*. Začíná se na Staroměstském náměstí. Pro ostrou verzi se vypíná v `src/app-config.ts` (`allowSimulatedWalk`).
 
+## Webová verze
+
+Stejná hra běží i v prohlížeči a na mobilu vypadá stejně. Na širokém monitoru se drží šířky telefonu. Místo nativní mapy používá [MapLibre](https://maplibre.org/) s tmavým podkladem z OpenStreetMap (CARTO). Poloha jde z prohlížeče, kroky se počítají z GPS a testovací chůze funguje stejně.
+
+```bash
+npx expo start --web        # vývoj na počítači
+npm run build:web           # statický web do složky dist/
+```
+
+Složku `dist/` stačí nahrát na jakýkoli statický hosting, třeba přetažením na Netlify Drop, na GitHub Pages nebo na EAS Hosting. **Na mobilu musí web běžet přes https**, jinak prohlížeč polohu nepovolí. Bez https jde hrát jen testovací chůze.
+
 ## Příkazy
 
 | Příkaz | Co dělá |
 | --- | --- |
+| `npm run build:web` | Statický web do `dist/` |
 | `npm test` | Jest testy herní logiky (`src/game/`) a geometrie mlhy |
 | `npm run typecheck` | TypeScript ve strict režimu |
 | `npm run fetch-places` | Stáhne všechna místa Prahy z OpenStreetMap (Overpass API) do `assets/places.json` |

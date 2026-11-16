@@ -4,17 +4,7 @@ import { Marker } from 'react-native-maps';
 import type { Place } from '@/game';
 import { color, font, rarityColor } from '@/theme';
 import { HexShape } from '@/components/hex-shape';
-
-const GLYPH: Record<Place['type'], string> = {
-  landmark: '♜',
-  viewpoint: '◉',
-  park: '❦',
-  museum: '▣',
-  church: '✝',
-  metro: 'M',
-  bridge: '⌒',
-  tower: '▲',
-};
+import { PLACE_GLYPH } from '@/utils/places';
 
 interface Props {
   place: Place;
@@ -53,7 +43,7 @@ export const PlaceMarker = memo(function PlaceMarker({ place, discovered, visibl
               place.type === 'metro' && styles.metro,
             ]}
           >
-            {visible || discovered ? GLYPH[place.type] : '?'}
+            {visible || discovered ? PLACE_GLYPH[place.type] : '?'}
           </Text>
         </View>
       </View>

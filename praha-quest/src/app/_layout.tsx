@@ -9,7 +9,7 @@ import { Tabs } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import { LevelUpOverlay } from '@/components/level-up-overlay';
 import { t } from '@/i18n';
 import { startFeedback } from '@/services/feedback';
@@ -36,32 +36,37 @@ export default function RootLayout() {
   if (!loaded && !error) return null;
 
   return (
-    <>
-      <StatusBar style="light" />
-      <GameSensors />
-      <Tabs
-        screenOptions={({ route }) => ({
-          headerShown: false,
-          sceneStyle: { backgroundColor: color.night },
-          tabBarStyle: styles.bar,
-          tabBarActiveTintColor: color.gilt,
-          tabBarInactiveTintColor: color.parchmentDim,
-          tabBarLabelStyle: styles.label,
-          tabBarIcon: ({ color: tint }) => (
-            <Text style={[styles.icon, { color: tint }]}>{GLYPH[route.name as keyof typeof GLYPH] ?? '•'}</Text>
-          ),
-        })}
-      >
-        <Tabs.Screen name="index" options={{ title: t.tabs.map }} />
-        <Tabs.Screen name="sbirka" options={{ title: t.tabs.collection }} />
-        <Tabs.Screen name="hrdina" options={{ title: t.tabs.profile }} />
-      </Tabs>
-      <LevelUpOverlay />
-    </>
+    <View style={styles.page}>
+      <View style={styles.frame}>
+        <StatusBar style="light" />
+        <GameSensors />
+        <Tabs
+          screenOptions={({ route }) => ({
+            headerShown: false,
+            sceneStyle: { backgroundColor: color.night },
+            tabBarStyle: styles.bar,
+            tabBarActiveTintColor: color.gilt,
+            tabBarInactiveTintColor: color.parchmentDim,
+            tabBarLabelStyle: styles.label,
+            tabBarIcon: ({ color: tint }) => (
+              <Text style={[styles.icon, { color: tint }]}>{GLYPH[route.name as keyof typeof GLYPH] ?? '•'}</Text>
+            ),
+          })}
+        >
+          <Tabs.Screen name="index" options={{ title: t.tabs.map }} />
+          <Tabs.Screen name="sbirka" options={{ title: t.tabs.collection }} />
+          <Tabs.Screen name="hrdina" options={{ title: t.tabs.profile }} />
+        </Tabs>
+        <LevelUpOverlay />
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  // On a wide browser window the game keeps its phone proportions, centred.
+  page: { flex: 1, backgroundColor: Platform.OS === 'web' ? '#08121A' : color.night, alignItems: 'center' },
+  frame: { flex: 1, width: '100%', maxWidth: Platform.OS === 'web' ? 480 : undefined, backgroundColor: color.night, overflow: 'hidden' },
   bar: { backgroundColor: color.night, borderTopColor: color.slateHigh, borderTopWidth: StyleSheet.hairlineWidth },
   label: { fontFamily: font.bodyMedium, fontSize: 12 },
   icon: { fontSize: 20, lineHeight: 24 },
