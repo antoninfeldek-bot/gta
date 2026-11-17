@@ -40,10 +40,11 @@ export default function App() {
   const moveActivity = (id, date) =>
     setActivities((list) => list.map((a) => (a.id === id ? { ...a, date } : a)))
 
+  const [confirmReset, setConfirmReset] = useState(false)
   const resetData = () => {
-    if (window.confirm('Opravdu obnovit výchozí seznam? Tvoje změny se ztratí.')) {
-      setActivities(INITIAL_ACTIVITIES)
-    }
+    if (!confirmReset) return setConfirmReset(true)
+    setActivities(INITIAL_ACTIVITIES)
+    setConfirmReset(false)
   }
 
   return (
@@ -102,8 +103,12 @@ export default function App() {
 
         <footer className="mt-12 flex flex-col items-center gap-2 text-center text-xs text-slate-400">
           <p>Data se ukládají jen v tomto prohlížeči (localStorage).</p>
-          <button onClick={resetData} className="underline decoration-dotted hover:text-slate-600">
-            Obnovit výchozí seznam
+          <button
+            onClick={resetData}
+            onBlur={() => setConfirmReset(false)}
+            className={confirmReset ? 'font-semibold text-rose-600' : 'underline decoration-dotted hover:text-slate-600'}
+          >
+            {confirmReset ? 'Klikni znovu – tvoje změny se ztratí' : 'Obnovit výchozí seznam'}
           </button>
         </footer>
       </div>

@@ -8,6 +8,7 @@ export default function ActivityModal({ activity, presetDate, onSave, onDelete, 
   const [category, setCategory] = useState(activity?.category ?? 'vylety')
   const [note, setNote] = useState(activity?.note ?? '')
   const [error, setError] = useState('')
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const inputRef = useRef(null)
 
   useEffect(() => {
@@ -142,10 +143,13 @@ export default function ActivityModal({ activity, presetDate, onSave, onDelete, 
           {isEdit && (
             <button
               type="button"
-              onClick={() => window.confirm('Opravdu smazat tuto aktivitu?') && onDelete(activity.id)}
-              className="rounded-xl px-4 py-2.5 text-sm font-semibold text-rose-600 hover:bg-rose-50 sm:mr-auto"
+              onClick={() => (confirmDelete ? onDelete(activity.id) : setConfirmDelete(true))}
+              onBlur={() => setConfirmDelete(false)}
+              className={`rounded-xl px-4 py-2.5 text-sm font-semibold sm:mr-auto ${
+                confirmDelete ? 'bg-rose-600 text-white hover:bg-rose-700' : 'text-rose-600 hover:bg-rose-50'
+              }`}
             >
-              Smazat
+              {confirmDelete ? 'Opravdu smazat?' : 'Smazat'}
             </button>
           )}
           <button
