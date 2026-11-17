@@ -7,6 +7,8 @@ describe('migrations', () => {
     const v1 = { schemaVersion: 1, playerSeed: 'abc', xp: 500, level: 3, coins: 7, revealedHexes: ['891e3550a6bffff'] };
     const state = migrateState(v1, 1, T0, 'fallback');
     expect(state.schemaVersion).toBe(GAME_CONFIG.schemaVersion);
+    expect(state.daily.questsDone).toEqual([]);
+    expect(state.story).toEqual({});
     expect(state.xp).toBe(500);
     expect(state.playerSeed).toBe('abc');
     expect(state.revealedHexes).toEqual({ '891e3550a6bffff': T0 });

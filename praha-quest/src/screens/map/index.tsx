@@ -1,4 +1,6 @@
 import * as Linking from 'expo-linking';
+import { useFocusEffect } from 'expo-router';
+import { setStatusBarStyle } from 'expo-status-bar';
 import { useCallback, useRef, useState } from 'react';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { APP_CONFIG } from '@/app-config';
@@ -28,6 +30,14 @@ export function MapScreen() {
   const selected = selectedId ? engine.placeById.get(selectedId) ?? null : null;
   const cardPlace: Place | null = selected ?? nearby[0]?.place ?? null;
   const cardDistance = cardPlace && position ? distanceM(position, cardPlace) : null;
+
+  // Light status bar over the night map; the plaster screens use dark.
+  useFocusEffect(
+    useCallback(() => {
+      setStatusBarStyle('light');
+      return () => setStatusBarStyle('dark');
+    }, []),
+  );
 
   const onSelectPlace = useCallback((id: string) => setSelectedId(id), []);
   const onPressMap = useCallback(
@@ -100,11 +110,11 @@ function PermissionCard() {
         )}
         {APP_CONFIG.allowSimulatedWalk ? (
           <Pressable style={[styles.permButton, web ? null : styles.permGhost]} onPress={() => setSetting('simulate', true)} accessibilityRole="button">
-            <Text style={[styles.permButtonText, web ? null : { color: color.parchment }]}>{t.location.trySimulation}</Text>
+            <Text style={[styles.permButtonText, web ? null : { color: color.ink }]}>{t.location.trySimulation}</Text>
           </Pressable>
         ) : (
           <Pressable style={[styles.permButton, styles.permGhost]} onPress={askAgain} accessibilityRole="button">
-            <Text style={[styles.permButtonText, { color: color.parchment }]}>{t.location.askButton}</Text>
+            <Text style={[styles.permButtonText, { color: color.ink }]}>{t.location.askButton}</Text>
           </Pressable>
         )}
       </View>
@@ -117,31 +127,33 @@ const styles = StyleSheet.create({
   bottom: { position: 'absolute', left: space.lg, right: space.lg, bottom: space.md, gap: space.sm },
   fabRow: { alignItems: 'flex-end' },
   fab: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: color.slate,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: color.slateHigh,
+    width: 50,
+    height: 50,
+    borderRadius: radius.plate,
+    backgroundColor: color.enamel,
+    borderWidth: 3,
+    borderColor: color.signRed,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  fabGlyph: { fontSize: 22, color: color.gilt, marginTop: -2 },
+  fabGlyph: { fontSize: 24, color: color.signRed, marginTop: -2 },
   banner: {
     alignSelf: 'center',
-    backgroundColor: 'rgba(24,42,55,0.95)',
-    borderRadius: radius.chip,
-    paddingVertical: 6,
+    backgroundColor: color.plateBlue,
+    borderRadius: radius.plate,
+    borderWidth: 1.5,
+    borderColor: color.white,
+    paddingVertical: 5,
     paddingHorizontal: space.md,
   },
-  bannerText: { fontFamily: font.bodyMedium, fontSize: size.caption, color: color.patina },
-  hint: { backgroundColor: color.slate, borderRadius: radius.panel, padding: space.lg },
-  hintText: { fontFamily: font.body, fontSize: size.body, color: color.parchmentDim },
-  permission: { backgroundColor: color.slate, borderRadius: radius.sheet, padding: space.lg, gap: space.sm },
-  permTitle: { fontFamily: font.display, fontSize: size.title, color: color.parchment },
-  permBody: { fontFamily: font.body, fontSize: size.small, lineHeight: 20, color: color.parchmentDim },
+  bannerText: { fontFamily: font.sign, fontSize: 15, letterSpacing: 0.4, color: color.white },
+  hint: { backgroundColor: color.enamel, borderRadius: radius.plate, borderWidth: 3, borderColor: color.signRed, padding: space.lg },
+  hintText: { fontFamily: font.sign, fontSize: 18, color: color.ink },
+  permission: { backgroundColor: color.enamel, borderRadius: radius.plate, borderWidth: 3, borderColor: color.signRed, padding: space.lg, gap: space.sm },
+  permTitle: { fontFamily: font.signHeavy, fontSize: 24, color: color.ink },
+  permBody: { fontFamily: font.body, fontSize: size.small, lineHeight: 20, color: color.inkSoft },
   permRow: { flexDirection: 'row', gap: space.sm },
-  permButton: { flex: 1, backgroundColor: color.gilt, borderRadius: radius.control, paddingVertical: 12, alignItems: 'center' },
-  permGhost: { backgroundColor: color.slateHigh },
-  permButtonText: { fontFamily: font.bodyBold, fontSize: size.small, color: color.ink },
+  permButton: { flex: 1, backgroundColor: color.signRed, borderRadius: radius.control, paddingVertical: 12, alignItems: 'center' },
+  permGhost: { backgroundColor: color.enamelShade },
+  permButtonText: { fontFamily: font.signHeavy, fontSize: 17, color: color.white },
 });

@@ -1,19 +1,24 @@
-import { Alert, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useState } from 'react';
+import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import { APP_CONFIG } from '@/app-config';
-import { ITEM_IDS, ITEM_RARITY, levelProgress } from '@/game';
-import { formatNumber, fmtDistance, t } from '@/i18n';
-import { useGameStore, type Settings } from '@/store/game-store';
+import { HousePlate } from '@/components/house-plate';
+import { Plate, Screen, SectionTitle } from '@/components/screen';
+import { StreetSign } from '@/components/street-sign';
+import { ITEM_IDS, ITEM_RARITY, levelProgress, nextRank, rankTitle } from '@/game';
+import { fmtDistance, formatNumber, t, tc } from '@/i18n';
+import { useGameStore } from '@/store/game-store';
 import { color, font, radius, rarityColor, size, space } from '@/theme';
 
 export function ProfileScreen() {
-  const insets = useSafeAreaInsets();
   const game = useGameStore((s) => s.game);
   const settings = useGameStore((s) => s.settings);
   const stepSource = useGameStore((s) => s.stepSource);
   const setSetting = useGameStore((s) => s.setSetting);
   const reset = useGameStore((s) => s.reset);
+  const [confirming, setConfirming] = useState(false);
   const progress = levelProgress(game.xp);
+  const rank = tc.ranks[rankTitle(progress.level)];
+  const upcoming = nextRank(progress.level);
   const rejected = Object.values(game.stats.rejectedFixes).reduce((a, b) => a + (b ?? 0), 0);
 
   const stats: [string, string][] = [
@@ -24,31 +29,19 @@ export function ProfileScreen() {
     [t.profile.sets, formatNumber(Object.keys(game.completedSets).length)],
     [t.profile.coins, formatNumber(game.coins)],
   ];
-
-  const confirmReset = () => {
-    if (Platform.OS === 'web') {
-      if (globalThis.confirm?.(t.profile.resetConfirmTitle)) reset();
-      return;
-    }
-    Alert.alert(t.profile.resetConfirmTitle, t.profile.resetConfirmBody, [
-      { text: t.profile.cancel, style: 'cancel' },
-      { text: t.profile.resetConfirm, style: 'destructive', onPress: reset },
-    ]);
-  };
-
   const owned = ITEM_IDS.filter((id) => (game.inventory[id] ?? 0) > 0);
 
   return (
-    <ScrollView
-      style={styles.root}
-      contentContainerStyle={{ paddingTop: insets.top + space.lg, paddingBottom: space.xxl, paddingHorizontal: space.lg, gap: space.xl }}
-    >
-      <View style={{ gap: space.xs }}>
-        <Text style={styles.h1}>{t.profile.title}</Text>
-        <Text style={styles.lead}>
-          {t.hud.level} {progress.level}
-          {progress.needed > 0 ? `, ${t.hud.xpToNext(progress.current, progress.needed)}` : ''}
-        </Text>
+    <Screen title={t.profile.title}>
+      <View style={styles.idRow}>
+        <HousePlate value={progress.level} size={76} caption="LEVEL" />
+        <View style={{ flex: 1, gap: 4 }}>
+          <StreetSign district="Titul" name={rank} size="md" />
+          <Text style={styles.small}>
+            {progress.needed > 0 ? t.hud.xpToNext(progress.current, progress.needed) : t.hud.maxLevel}
+            {upcoming ? `. Další titul ${tc.ranks[upcoming.id]} na levelu ${upcoming.minLevel}.` : ''}
+          </Text>
+        </View>
       </View>
 
       <View style={styles.grid}>
@@ -60,90 +53,98 @@ export function ProfileScreen() {
         ))}
       </View>
 
-      <View style={{ gap: space.md }}>
-        <Text style={styles.h2}>{t.profile.inventory}</Text>
-        {owned.length === 0 ? (
-          <Text style={styles.muted}>{t.profile.inventoryEmpty}</Text>
-        ) : (
-          owned.map((id) => (
-            <View key={id} style={styles.item}>
-              <View style={[styles.itemMark, { backgroundColor: rarityColor[ITEM_RARITY[id]] }]} />
-              <View style={{ flex: 1 }}>
-                <Text style={styles.itemName}>{t.items[id].name}</Text>
-                <Text style={styles.muted}>{t.items[id].description}</Text>
-              </View>
-              <Text style={styles.itemCount}>×{game.inventory[id]}</Text>
-            </View>
-          ))
-        )}
+      <SectionTitle hint={owned.length === 0 ? t.profile.inventoryEmpty : undefined}>{t.profile.inventory}</SectionTitle>
+      {owned.map((id) => (
+        <Plate key={id} tone={rarityColor[ITEM_RARITY[id]]} style={styles.item}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.itemName}>{t.items[id].name}</Text>
+            <Text style={styles.small}>{t.items[id].description}</Text>
+          </View>
+          <Text style={styles.itemCount}>×{game.inventory[id]}</Text>
+        </Plate>
+      ))}
+
+      <SectionTitle>{t.profile.settings}</SectionTitle>
+      <Toggle label={t.profile.sound} value={settings.sound} onChange={(v) => setSetting('sound', v)} />
+      <Toggle label={t.profile.haptics} value={settings.haptics} onChange={(v) => setSetting('haptics', v)} />
+      {APP_CONFIG.allowSimulatedWalk ? (
+        <Toggle label={t.profile.simulate} hint={t.profile.simulateHint} value={settings.simulate} onChange={(v) => setSetting('simulate', v)} />
+      ) : null}
+      <View style={styles.infoRow}>
+        <Text style={styles.label}>{t.profile.stepSource}</Text>
+        <Text style={styles.small}>{stepSource === 'pedometer' ? t.profile.stepSourcePedometer : t.profile.stepSourceGps}</Text>
+      </View>
+      <View style={styles.infoRow}>
+        <Text style={styles.label}>{t.profile.rejected}</Text>
+        <Text style={styles.small}>{formatNumber(rejected)}</Text>
       </View>
 
-      <View style={{ gap: space.sm }}>
-        <Text style={styles.h2}>{t.profile.settings}</Text>
-        <Toggle label={t.profile.sound} value={settings.sound} onChange={(v) => setSetting('sound', v)} />
-        <Toggle label={t.profile.haptics} value={settings.haptics} onChange={(v) => setSetting('haptics', v)} />
-        {APP_CONFIG.allowSimulatedWalk ? (
-          <Toggle
-            label={t.profile.simulate}
-            hint={t.profile.simulateHint}
-            value={settings.simulate}
-            onChange={(v) => setSetting('simulate' as keyof Settings, v)}
-          />
-        ) : null}
-        <View style={styles.infoRow}>
-          <Text style={styles.toggleLabel}>{t.profile.stepSource}</Text>
-          <Text style={styles.muted}>{stepSource === 'pedometer' ? t.profile.stepSourcePedometer : t.profile.stepSourceGps}</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.toggleLabel}>{t.profile.rejected}</Text>
-          <Text style={styles.muted}>{formatNumber(rejected)}</Text>
-        </View>
-      </View>
-
-      <Pressable onPress={confirmReset} style={styles.reset} accessibilityRole="button">
-        <Text style={styles.resetText}>{t.profile.reset}</Text>
-      </Pressable>
+      {confirming ? (
+        <Plate tone={color.signRed}>
+          <Text style={styles.label}>{t.profile.resetConfirmTitle}</Text>
+          <Text style={styles.small}>{t.profile.resetConfirmBody}</Text>
+          <View style={{ flexDirection: 'row', gap: space.sm }}>
+            <Pressable style={[styles.btn, { backgroundColor: color.signRed }]} onPress={() => (reset(), setConfirming(false))}>
+              <Text style={[styles.btnText, { color: color.white }]}>{t.profile.resetConfirm}</Text>
+            </Pressable>
+            <Pressable style={[styles.btn, { backgroundColor: color.enamelShade }]} onPress={() => setConfirming(false)}>
+              <Text style={styles.btnText}>{t.profile.cancel}</Text>
+            </Pressable>
+          </View>
+        </Plate>
+      ) : (
+        <Pressable onPress={() => setConfirming(true)} style={styles.reset} accessibilityRole="button">
+          <Text style={styles.resetText}>{t.profile.reset}</Text>
+        </Pressable>
+      )}
       <Text style={styles.credit}>{t.profile.dataSource}</Text>
-    </ScrollView>
+    </Screen>
   );
 }
 
 function Toggle({ label, hint, value, onChange }: { label: string; hint?: string; value: boolean; onChange: (v: boolean) => void }) {
   return (
-    <View style={styles.toggle}>
+    <Plate style={styles.toggle}>
       <View style={{ flex: 1, gap: 2 }}>
-        <Text style={styles.toggleLabel}>{label}</Text>
-        {hint ? <Text style={styles.muted}>{hint}</Text> : null}
+        <Text style={styles.label}>{label}</Text>
+        {hint ? <Text style={styles.small}>{hint}</Text> : null}
       </View>
       <Switch
         value={value}
         onValueChange={onChange}
-        trackColor={{ true: color.giltDeep, false: color.slateHigh }}
-        thumbColor={value ? color.gilt : color.parchmentDim}
+        trackColor={{ true: color.signRed, false: color.enamelEdge }}
+        thumbColor={color.white}
+        {...({ activeThumbColor: color.white } as object)}
         accessibilityLabel={label}
       />
-    </View>
+    </Plate>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: color.night },
-  h1: { fontFamily: font.display, fontSize: size.hero, lineHeight: 50, color: color.parchment },
-  h2: { fontFamily: font.display, fontSize: size.title, color: color.parchment },
-  lead: { fontFamily: font.bodyMedium, fontSize: size.body, color: color.gilt },
+  idRow: { flexDirection: 'row', alignItems: 'center', gap: space.md },
+  small: { fontFamily: font.body, fontSize: size.small, lineHeight: 20, color: color.inkSoft },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
-  stat: { flexBasis: '48%', flexGrow: 1, backgroundColor: color.slate, borderRadius: radius.panel, padding: space.lg, gap: 2 },
-  statValue: { fontFamily: font.display, fontSize: size.headline, color: color.parchment, fontVariant: ['tabular-nums'] },
-  statLabel: { fontFamily: font.body, fontSize: size.small, color: color.parchmentDim },
-  muted: { fontFamily: font.body, fontSize: size.small, lineHeight: 20, color: color.parchmentDim },
-  item: { flexDirection: 'row', alignItems: 'center', gap: space.md, backgroundColor: color.slate, borderRadius: radius.control, padding: space.md },
-  itemMark: { width: 10, height: 34, borderRadius: 3 },
-  itemName: { fontFamily: font.bodyBold, fontSize: size.body, color: color.parchment },
-  itemCount: { fontFamily: font.display, fontSize: size.title, color: color.gilt },
-  toggle: { flexDirection: 'row', alignItems: 'center', gap: space.md, backgroundColor: color.slate, borderRadius: radius.control, padding: space.md },
-  toggleLabel: { fontFamily: font.bodyMedium, fontSize: size.body, color: color.parchment },
-  infoRow: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: space.md, paddingVertical: space.sm },
+  stat: {
+    flexBasis: '31%',
+    flexGrow: 1,
+    backgroundColor: color.enamel,
+    borderRadius: radius.plate,
+    borderWidth: 2,
+    borderColor: color.enamelEdge,
+    padding: space.md,
+  },
+  statValue: { fontFamily: font.signHeavy, fontSize: 26, color: color.ink, fontVariant: ['tabular-nums'] },
+  statLabel: { fontFamily: font.body, fontSize: 12, color: color.inkSoft },
+  item: { flexDirection: 'row', alignItems: 'center' },
+  itemName: { fontFamily: font.signHeavy, fontSize: 18, color: color.ink },
+  itemCount: { fontFamily: font.signHeavy, fontSize: 24, color: color.signRed },
+  toggle: { flexDirection: 'row', alignItems: 'center' },
+  label: { fontFamily: font.bodyBold, fontSize: size.body, color: color.ink },
+  infoRow: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: space.xs },
   reset: { alignSelf: 'flex-start', paddingVertical: space.sm },
-  resetText: { fontFamily: font.bodyMedium, fontSize: size.body, color: color.danger },
-  credit: { fontFamily: font.body, fontSize: size.caption, color: color.parchmentDim },
+  resetText: { fontFamily: font.bodyBold, fontSize: size.body, color: color.signRed },
+  btn: { flex: 1, borderRadius: radius.control, paddingVertical: 12, alignItems: 'center' },
+  btnText: { fontFamily: font.signHeavy, fontSize: 17, color: color.ink },
+  credit: { fontFamily: font.body, fontSize: size.caption, color: color.inkMute },
 });

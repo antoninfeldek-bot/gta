@@ -8,3 +8,4 @@ export * from './migrations';
 export * from './state';
 export * from './time';
 export * from './types';
+export * from './quests';

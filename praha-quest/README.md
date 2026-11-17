@@ -47,6 +47,16 @@ Složku `dist/` stačí nahrát na jakýkoli statický hosting, třeba přetaže
 
 Plná data z OpenStreetMap stáhne `npm run fetch-places`. Skript vybere památky s `wikidata`, vyhlídky, parky nad 2 ha, muzea, kostely, věže, mosty a všechny stanice metra. Doplní městské části, sloučí duplicity do 50 m a přiřadí vzácnost i sady. V cloudovém prostředí, kde prototyp vznikal, Overpass neodpovídal. **Spusť ho jednou u sebe**; na běžném internetu to trvá asi minutu. Pak commitni nový `assets/places.json`.
 
+## Co ve hře je
+
+- **Mapa:** mlha z hexů, místa jako smaltované tabulky, pověsti a tipy na jídlo na kartě místa.
+- **Úkoly:** tři denní úkoly (kroky, hexy, kavárna, hospoda, metro…) a bonus za sérii dní v kuse. K tomu 8 výprav po pověstech: Golemova stopa, Alchymistův elixír, Libušino proroctví, Mistr Hanuš, Kafe jako za první republiky, Pivní stezka, Zelená linka a Přes Vltavu.
+- **Sbírka:** Kuchařka s 15 českými jídly (odemykají je kavárny, hospody a trhy), sady míst a seznam všech míst.
+- **Žebříček:** týdenní souboj s pražskými postavami (Mistr Hanuš, Golem, kněžna Libuše, rytíř Bruncvík, Švejk…) a tvoje Praha po městských částech. Postavy jsou fiktivní soupeři, hra je zatím offline.
+- **Hrdina:** level jako modrá tabulka s číslem domu, pražské tituly od Turisty po Otce vlasti, relikvie a nastavení.
+
+Design vychází z pražského uličního mobiliáře: smaltované uliční cedule s červeným rámem, modré tabulky s čísly domů, stylizovaný pražský znak a odjezdová tabule PID v žebříčku. Znak je nakreslený pro hru. Pro veřejné nebo komerční vydání je k užití městských symbolů potřeba souhlas hlavního města Prahy.
+
 ## Herní pravidla (`src/game/config.ts`)
 
 | Pravidlo | Hodnota |

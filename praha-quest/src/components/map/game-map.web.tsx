@@ -10,10 +10,11 @@ import { APP_CONFIG } from '@/app-config';
 import { cellFor, type Place } from '@/game';
 import { engine, useGameStore } from '@/store/game-store';
 import { useSensorStore } from '@/store/sensor-store';
-import { color, font, rarityColor } from '@/theme';
+import { color, font } from '@/theme';
 import { computeFog, quantizeRegion, type LatLng, type Region } from '@/utils/fog';
 import { PLACE_GLYPH, PRAGUE_REGION, visiblePlaces } from '@/utils/places';
 import type { GameMapHandle, GameMapProps } from './game-map.types';
+import { markerLook } from './marker-style';
 import { BASEMAP_LAYERS, BASEMAP_SOURCE, GLYPHS } from './web-map-style';
 
 const STYLE: maplibregl.StyleSpecification = {
@@ -28,10 +29,10 @@ const STYLE: maplibregl.StyleSpecification = {
   layers: [
     { id: 'bg', type: 'background', paint: { 'background-color': color.night } },
     ...BASEMAP_LAYERS,
-    { id: 'grid', type: 'line', source: 'grid', paint: { 'line-color': 'rgba(226,177,77,0.12)', 'line-width': 1 } },
+    { id: 'grid', type: 'line', source: 'grid', paint: { 'line-color': 'rgba(245,241,230,0.10)', 'line-width': 1 } },
     { id: 'fog', type: 'fill', source: 'fog', paint: { 'fill-color': color.fog, 'fill-antialias': false } },
-    { id: 'shores-fill', type: 'fill', source: 'shores', paint: { 'fill-color': 'rgba(111,183,160,0.06)' } },
-    { id: 'shores', type: 'line', source: 'shores', paint: { 'line-color': 'rgba(111,183,160,0.85)', 'line-width': 2 } },
+    { id: 'shores-fill', type: 'fill', source: 'shores', paint: { 'fill-color': 'rgba(226,167,46,0.05)' } },
+    { id: 'shores', type: 'line', source: 'shores', paint: { 'line-color': color.gold, 'line-width': 2.5, 'line-opacity': 0.9 } },
   ],
 };
 
@@ -172,9 +173,9 @@ export const GameMap = forwardRef<GameMapHandle, GameMapProps>(function GameMap(
         width: '18px',
         height: '18px',
         borderRadius: '50%',
-        background: color.gilt,
-        border: `3px solid ${color.parchment}`,
-        boxShadow: '0 0 0 6px rgba(226,177,77,0.25)',
+        background: color.signRed,
+        border: `3px solid ${color.enamel}`,
+        boxShadow: '0 0 0 7px rgba(196,18,47,0.28)',
         pointerEvents: 'none',
         zIndex: '5',
       });
@@ -216,40 +217,27 @@ function setData(map: maplibregl.Map, id: string, features: GeoJSON.Feature[]) {
   (map.getSource(id) as maplibregl.GeoJSONSource | undefined)?.setData({ type: 'FeatureCollection', features });
 }
 
-const HEX_CLIP = 'polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)';
-
-/** Pointy-top hexagon marker, matching the native HexShape. */
+/** Small enamel plate marker, matching the native PlaceMarker. */
 function paintMarker(el: HTMLDivElement, place: Place, found: boolean, visible: boolean) {
-  const tint = rarityColor[place.rarity];
-  const big = place.rarity === 'legendary' || place.rarity === 'epic';
-  const size = big ? 38 : 30;
+  const look = markerLook(place, found, visible);
   el.setAttribute('role', 'button');
   el.setAttribute('aria-label', place.nameCs);
   el.title = place.nameCs;
   Object.assign(el.style, {
-    width: `${size}px`,
-    height: `${size}px`,
+    width: `${look.sizePx}px`,
+    height: `${look.sizePx}px`,
+    boxSizing: 'border-box',
     cursor: 'pointer',
-    clipPath: HEX_CLIP,
-    background: tint,
+    borderRadius: '6px',
+    border: `2.5px solid ${look.border}`,
+    background: look.bg,
+    color: look.fg,
     display: 'grid',
     placeItems: 'center',
-    opacity: found || visible ? '1' : '0.7',
-    zIndex: big ? '2' : '1',
-  });
-  el.innerHTML = '';
-  const inner = document.createElement('div');
-  Object.assign(inner.style, {
-    width: `${size - 5}px`,
-    height: `${size - 5}px`,
-    clipPath: HEX_CLIP,
-    background: found ? tint : color.night,
-    color: found ? color.ink : tint,
-    display: 'grid',
-    placeItems: 'center',
-    font: `${big ? 17 : 14}px ${place.type === 'metro' ? font.displayBlack : font.bodyBold}, system-ui, sans-serif`,
+    font: `${look.big ? 18 : 15}px ${font.signHeavy}, 'Barlow Condensed', system-ui, sans-serif`,
     lineHeight: '1',
+    boxShadow: '0 2px 6px rgba(0,0,0,0.45)',
+    zIndex: look.big ? '2' : '1',
   });
-  inner.textContent = found || visible ? PLACE_GLYPH[place.type] : '?';
-  el.appendChild(inner);
+  el.textContent = found || visible ? PLACE_GLYPH[place.type] : '?';
 }

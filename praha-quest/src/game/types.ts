@@ -2,7 +2,20 @@
 
 export type PlaceRarity = 'common' | 'rare' | 'epic' | 'legendary';
 
-export type PlaceType = 'landmark' | 'viewpoint' | 'park' | 'museum' | 'church' | 'metro' | 'bridge' | 'tower';
+export type PlaceType =
+  | 'landmark'
+  | 'viewpoint'
+  | 'park'
+  | 'museum'
+  | 'church'
+  | 'metro'
+  | 'bridge'
+  | 'tower'
+  | 'cafe'
+  | 'pub'
+  | 'food';
+
+export const FOOD_TYPES: readonly PlaceType[] = ['cafe', 'pub', 'food'];
 
 export interface Place {
   id: string;
@@ -12,6 +25,8 @@ export interface Place {
   lng: number;
   district: string;
   wikidata?: string;
+  /** Czech dish this place unlocks in the cookbook (food places only). */
+  dish?: string;
   rarity: PlaceRarity;
 }
 
@@ -50,14 +65,19 @@ export type GameEvent =
 export type RejectReason = 'accuracy' | 'speed' | 'teleport' | 'stale' | 'order';
 
 export type Reward =
-  | { kind: 'xp'; amount: number; source: 'hex' | 'steps' | 'place' | 'set' }
-  | { kind: 'coins'; amount: number; source: 'place' | 'set' | 'level' }
+  | { kind: 'xp'; amount: number; source: 'hex' | 'steps' | 'place' | 'set' | 'quest' }
+  | { kind: 'coins'; amount: number; source: 'place' | 'set' | 'level' | 'quest' }
   | { kind: 'item'; itemId: string; count: number }
   | { kind: 'hexRevealed'; cell: string }
   | { kind: 'levelUp'; level: number }
   | { kind: 'placeDiscovered'; placeId: string }
   | { kind: 'placeRevisited'; placeId: string }
-  | { kind: 'setCompleted'; setId: string };
+  | { kind: 'setCompleted'; setId: string }
+  | { kind: 'dishUnlocked'; dishId: string }
+  | { kind: 'dailyQuestDone'; questId: string }
+  | { kind: 'dailyAllDone'; streak: number }
+  | { kind: 'storyStep'; questId: string; step: number }
+  | { kind: 'storyDone'; questId: string };
 
 export type CheckInFailure = 'unknownPlace' | 'noFix' | 'tooFar' | 'cooldown';
 
@@ -92,7 +112,22 @@ export interface GameState {
     steps: number;
     /** Steps that counted toward XP today (≤ daily cap). */
     xpSteps: number;
+    /** Hexes revealed today. */
+    hexes: number;
+    /** Successful check-ins today, total and per place type. */
+    checkIns: number;
+    checkInTypes: Partial<Record<PlaceType, number>>;
+    /** Daily quest ids already rewarded today. */
+    questsDone: string[];
   };
+  /** Consecutive days with all daily quests done. */
+  streak: { count: number; lastDay: string | null };
+  /** XP earned in the current game week (for the leaderboard). */
+  weekly: { week: string; xp: number };
+  /** Story quest id -> progress. */
+  story: Record<string, { step: number; completedAt: number | null }>;
+  /** Cookbook: dish id -> epoch ms unlocked. */
+  dishes: Record<string, number>;
   totalSteps: number;
   /** Fractional metres walked on GPS fallback, carried into the next step. */
   gpsStepRemainderM: number;

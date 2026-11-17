@@ -21,7 +21,7 @@ export const FogLayer = memo(function FogLayer({ region, revealed }: Props) {
   return (
     <>
       {geometry.grid.map((cell, i) => (
-        <Polygon key={`g${i}`} coordinates={cell} strokeColor="rgba(226,177,77,0.10)" strokeWidth={1} fillColor="transparent" zIndex={1} />
+        <Polygon key={`g${i}`} coordinates={cell} strokeColor="rgba(245,241,230,0.10)" strokeWidth={1} fillColor="transparent" zIndex={1} />
       ))}
       <Polygon
         coordinates={geometry.fog}
@@ -35,7 +35,7 @@ export const FogLayer = memo(function FogLayer({ region, revealed }: Props) {
         <Polygon key={`i${i}`} coordinates={loop} fillColor={color.fog} strokeWidth={0} strokeColor="transparent" zIndex={2} />
       ))}
       {geometry.shores.map((loop, i) => (
-        <Polygon key={`s${i}`} coordinates={loop} strokeColor="rgba(111,183,160,0.85)" strokeWidth={2} fillColor="rgba(111,183,160,0.06)" zIndex={3} />
+        <Polygon key={`s${i}`} coordinates={loop} strokeColor={color.gold} strokeWidth={2.5} fillColor="rgba(226,167,46,0.05)" zIndex={3} />
       ))}
     </>
   );

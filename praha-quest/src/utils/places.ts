@@ -31,6 +31,9 @@ export const PLACE_GLYPH: Record<Place['type'], string> = {
   metro: 'M',
   bridge: '⌒',
   tower: '▲',
+  cafe: 'K',
+  pub: 'H',
+  food: 'J',
 };
 
 /** Where the map opens before the player has a position (Staroměstské náměstí). */

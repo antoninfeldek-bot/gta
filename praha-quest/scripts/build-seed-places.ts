@@ -17,7 +17,7 @@ import type { Place, PlaceRarity, PlaceSet, PlaceType } from '../src/game/types'
 const OUT_FILE = resolve(__dirname, '../assets/places.json');
 const METRO_FILE = resolve(__dirname, 'data/pid-metro-stops.geojson');
 
-type Seed = [nameCs: string, type: PlaceType, lat: number, lng: number, district: string, rarity: PlaceRarity];
+type Seed = [nameCs: string, type: PlaceType, lat: number, lng: number, district: string, rarity: PlaceRarity, dish?: string];
 
 const LANDMARKS: Seed[] = [
   ['Pražský hrad', 'landmark', 50.0899, 14.3983, 'Praha 1', 'legendary'],
@@ -81,6 +81,23 @@ const LANDMARKS: Seed[] = [
   ['Veletržní palác', 'museum', 50.1015, 14.4335, 'Praha 7', 'rare'],
   ['Museum Kampa', 'museum', 50.0841, 14.4093, 'Praha 1', 'common'],
   ['Uměleckoprůmyslové museum', 'museum', 50.0895, 14.4166, 'Praha 1', 'common'],
+
+  // Long-standing cafés, pubs and markets. Each unlocks one Czech dish in the cookbook.
+  ['Kavárna Slavia', 'cafe', 50.0816, 14.4135, 'Praha 1', 'epic', 'vetrnik'],
+  ['Café Louvre', 'cafe', 50.082, 14.4189, 'Praha 1', 'rare', 'rakvicka'],
+  ['Grand Café Orient', 'cafe', 50.0868, 14.4246, 'Praha 1', 'rare', 'laskonka'],
+  ['Café Imperial', 'cafe', 50.0897, 14.4318, 'Praha 1', 'rare', 'kolac'],
+  ['Café Savoy', 'cafe', 50.079, 14.4085, 'Praha 5', 'rare', 'medovnik'],
+  ['Kavárna Lucerna', 'cafe', 50.0812, 14.4255, 'Praha 1', 'common', 'spicka'],
+  ['U Fleků', 'pub', 50.0786, 14.417, 'Praha 1', 'epic', 'svickova'],
+  ['U Zlatého tygra', 'pub', 50.0857, 14.4187, 'Praha 1', 'rare', 'hermelin'],
+  ['U Medvídků', 'pub', 50.0827, 14.4189, 'Praha 1', 'rare', 'gulas'],
+  ['U Pinkasů', 'pub', 50.0828, 14.4236, 'Praha 1', 'rare', 'vepro-knedlo-zelo'],
+  ['Lokál Dlouhááá', 'pub', 50.0903, 14.4255, 'Praha 1', 'common', 'smazak'],
+  ['Pivovarský dům', 'pub', 50.0753, 14.422, 'Praha 2', 'common', 'utopenec'],
+  ['Letenský zámeček', 'pub', 50.096, 14.4185, 'Praha 7', 'common', 'rizek'],
+  ['Náplavka', 'food', 50.0705, 14.414, 'Praha 2', 'common', 'bramborak'],
+  ['Havelské tržiště', 'food', 50.0848, 14.4205, 'Praha 1', 'common', 'trdelnik'],
 ];
 
 /** Transfer stations are worth more. */
@@ -112,7 +129,7 @@ const metro = (JSON.parse(readFileSync(METRO_FILE, 'utf8')) as { features: Metro
   lines: [...new Set(f.properties.platforms.map((p) => p.name))],
 }));
 
-const landmarks: Place[] = LANDMARKS.map(([nameCs, type, lat, lng, district, rarity]) => ({
+const landmarks: Place[] = LANDMARKS.map(([nameCs, type, lat, lng, district, rarity, dish]) => ({
   id: `seed-${slug(nameCs)}`,
   nameCs,
   type,
@@ -120,6 +137,7 @@ const landmarks: Place[] = LANDMARKS.map(([nameCs, type, lat, lng, district, rar
   lng,
   district,
   rarity,
+  ...(dish ? { dish } : {}),
 }));
 
 const places = [...metro.map((m) => m.place), ...landmarks].sort((a, b) => a.nameCs.localeCompare(b.nameCs, 'cs'));
@@ -137,6 +155,9 @@ const sets: PlaceSet[] = [
   { id: 'towers', nameCs: 'Pražské věže', placeIds: ofType('tower') },
   { id: 'museums', nameCs: 'Muzea', placeIds: ofType('museum') },
   { id: 'parks', nameCs: 'Parky a zahrady', placeIds: ofType('park') },
+  { id: 'cafes', nameCs: 'Prvorepublikové kavárny', placeIds: ofType('cafe') },
+  { id: 'pubs', nameCs: 'Pivní mapa Prahy', placeIds: ofType('pub') },
+  { id: 'food-all', nameCs: 'Mlsná Praha', placeIds: places.filter((p) => ['cafe', 'pub', 'food'].includes(p.type)).map((p) => p.id) },
   { id: 'legends', nameCs: 'Legendy Prahy', placeIds: places.filter((p) => p.rarity === 'legendary').map((p) => p.id) },
   {
     id: 'royal-route',

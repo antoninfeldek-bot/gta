@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { APP_CONFIG } from '@/app-config';
 import type { PlaceRarity } from '@/game';
 
-export type ToastTone = 'xp' | 'place' | 'item' | 'set' | 'warn';
+export type ToastTone = 'xp' | 'place' | 'item' | 'set' | 'quest' | 'food' | 'warn';
 
 export interface Toast {
   id: number;
@@ -10,6 +10,8 @@ export interface Toast {
   title: string;
   detail?: string;
   rarity?: PlaceRarity;
+  /** Short exclamation shown before the title ("No teda!"). */
+  cheer?: string;
 }
 
 interface FeedStore {

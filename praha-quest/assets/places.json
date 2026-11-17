@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-16T22:06:16.390Z",
+ "generatedAt": "2026-11-17T16:22:08.866Z",
  "source": "seed: metro from PID timetable data (via krystxf/metro-now, MPL-2.0); landmarks hand-entered — replace with `npm run fetch-places`",
  "places": [
   {
@@ -28,6 +28,36 @@
    "lng": 14.4482613,
    "district": "Praha",
    "rarity": "common"
+  },
+  {
+   "id": "seed-cafe-imperial",
+   "nameCs": "Café Imperial",
+   "type": "cafe",
+   "lat": 50.0897,
+   "lng": 14.4318,
+   "district": "Praha 1",
+   "rarity": "rare",
+   "dish": "kolac"
+  },
+  {
+   "id": "seed-cafe-louvre",
+   "nameCs": "Café Louvre",
+   "type": "cafe",
+   "lat": 50.082,
+   "lng": 14.4189,
+   "district": "Praha 1",
+   "rarity": "rare",
+   "dish": "rakvicka"
+  },
+  {
+   "id": "seed-cafe-savoy",
+   "nameCs": "Café Savoy",
+   "type": "cafe",
+   "lat": 50.079,
+   "lng": 14.4085,
+   "district": "Praha 5",
+   "rarity": "rare",
+   "dish": "medovnik"
   },
   {
    "id": "seed-cechuv-most",
@@ -93,6 +123,16 @@
    "rarity": "rare"
   },
   {
+   "id": "seed-grand-cafe-orient",
+   "nameCs": "Grand Café Orient",
+   "type": "cafe",
+   "lat": 50.0868,
+   "lng": 14.4246,
+   "district": "Praha 1",
+   "rarity": "rare",
+   "dish": "laskonka"
+  },
+  {
    "id": "metro-haje",
    "nameCs": "Háje",
    "type": "metro",
@@ -109,6 +149,16 @@
    "lng": 14.4142,
    "district": "Praha 7",
    "rarity": "rare"
+  },
+  {
+   "id": "seed-havelske-trziste",
+   "nameCs": "Havelské tržiště",
+   "type": "food",
+   "lat": 50.0848,
+   "lng": 14.4205,
+   "district": "Praha 1",
+   "rarity": "common",
+   "dish": "trdelnik"
   },
   {
    "id": "seed-havlickovy-sady",
@@ -273,6 +323,26 @@
    "rarity": "legendary"
   },
   {
+   "id": "seed-kavarna-lucerna",
+   "nameCs": "Kavárna Lucerna",
+   "type": "cafe",
+   "lat": 50.0812,
+   "lng": 14.4255,
+   "district": "Praha 1",
+   "rarity": "common",
+   "dish": "spicka"
+  },
+  {
+   "id": "seed-kavarna-slavia",
+   "nameCs": "Kavárna Slavia",
+   "type": "cafe",
+   "lat": 50.0816,
+   "lng": 14.4135,
+   "district": "Praha 1",
+   "rarity": "epic",
+   "dish": "vetrnik"
+  },
+  {
    "id": "seed-klementinum",
    "nameCs": "Klementinum",
    "type": "landmark",
@@ -354,6 +424,16 @@
    "rarity": "rare"
   },
   {
+   "id": "seed-letensky-zamecek",
+   "nameCs": "Letenský zámeček",
+   "type": "pub",
+   "lat": 50.096,
+   "lng": 14.4185,
+   "district": "Praha 7",
+   "rarity": "common",
+   "dish": "rizek"
+  },
+  {
    "id": "metro-letnany",
    "nameCs": "Letňany",
    "type": "metro",
@@ -370,6 +450,16 @@
    "lng": 14.3291,
    "district": "Praha 6",
    "rarity": "rare"
+  },
+  {
+   "id": "seed-lokal-dlouhaaa",
+   "nameCs": "Lokál Dlouhááá",
+   "type": "pub",
+   "lat": 50.0903,
+   "lng": 14.4255,
+   "district": "Praha 1",
+   "rarity": "common",
+   "dish": "smazak"
   },
   {
    "id": "seed-loreta",
@@ -516,6 +606,16 @@
    "rarity": "common"
   },
   {
+   "id": "seed-naplavka",
+   "nameCs": "Náplavka",
+   "type": "food",
+   "lat": 50.0705,
+   "lng": 14.414,
+   "district": "Praha 2",
+   "rarity": "common",
+   "dish": "bramborak"
+  },
+  {
    "id": "seed-narodni-divadlo",
    "nameCs": "Národní divadlo",
    "type": "landmark",
@@ -658,6 +758,16 @@
    "lng": 14.344923,
    "district": "Praha",
    "rarity": "common"
+  },
+  {
+   "id": "seed-pivovarsky-dum",
+   "nameCs": "Pivovarský dům",
+   "type": "pub",
+   "lat": 50.0753,
+   "lng": 14.422,
+   "district": "Praha 2",
+   "rarity": "common",
+   "dish": "utopenec"
   },
   {
    "id": "seed-prasna-brana",
@@ -883,6 +993,46 @@
    "lng": 14.4228,
    "district": "Praha 1",
    "rarity": "epic"
+  },
+  {
+   "id": "seed-u-fleku",
+   "nameCs": "U Fleků",
+   "type": "pub",
+   "lat": 50.0786,
+   "lng": 14.417,
+   "district": "Praha 1",
+   "rarity": "epic",
+   "dish": "svickova"
+  },
+  {
+   "id": "seed-u-medvidku",
+   "nameCs": "U Medvídků",
+   "type": "pub",
+   "lat": 50.0827,
+   "lng": 14.4189,
+   "district": "Praha 1",
+   "rarity": "rare",
+   "dish": "gulas"
+  },
+  {
+   "id": "seed-u-pinkasu",
+   "nameCs": "U Pinkasů",
+   "type": "pub",
+   "lat": 50.0828,
+   "lng": 14.4236,
+   "district": "Praha 1",
+   "rarity": "rare",
+   "dish": "vepro-knedlo-zelo"
+  },
+  {
+   "id": "seed-u-zlateho-tygra",
+   "nameCs": "U Zlatého tygra",
+   "type": "pub",
+   "lat": 50.0857,
+   "lng": 14.4187,
+   "district": "Praha 1",
+   "rarity": "rare",
+   "dish": "hermelin"
   },
   {
    "id": "seed-umeleckoprumyslove-museum",
@@ -1224,6 +1374,52 @@
     "seed-stromovka",
     "seed-valdstejnska-zahrada",
     "seed-zoologicka-zahrada-praha"
+   ]
+  },
+  {
+   "id": "cafes",
+   "nameCs": "Prvorepublikové kavárny",
+   "placeIds": [
+    "seed-cafe-imperial",
+    "seed-cafe-louvre",
+    "seed-cafe-savoy",
+    "seed-grand-cafe-orient",
+    "seed-kavarna-lucerna",
+    "seed-kavarna-slavia"
+   ]
+  },
+  {
+   "id": "pubs",
+   "nameCs": "Pivní mapa Prahy",
+   "placeIds": [
+    "seed-letensky-zamecek",
+    "seed-lokal-dlouhaaa",
+    "seed-pivovarsky-dum",
+    "seed-u-fleku",
+    "seed-u-medvidku",
+    "seed-u-pinkasu",
+    "seed-u-zlateho-tygra"
+   ]
+  },
+  {
+   "id": "food-all",
+   "nameCs": "Mlsná Praha",
+   "placeIds": [
+    "seed-cafe-imperial",
+    "seed-cafe-louvre",
+    "seed-cafe-savoy",
+    "seed-grand-cafe-orient",
+    "seed-havelske-trziste",
+    "seed-kavarna-lucerna",
+    "seed-kavarna-slavia",
+    "seed-letensky-zamecek",
+    "seed-lokal-dlouhaaa",
+    "seed-naplavka",
+    "seed-pivovarsky-dum",
+    "seed-u-fleku",
+    "seed-u-medvidku",
+    "seed-u-pinkasu",
+    "seed-u-zlateho-tygra"
    ]
   },
   {

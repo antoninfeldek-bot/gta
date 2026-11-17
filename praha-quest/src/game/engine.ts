@@ -8,8 +8,10 @@ import { distanceM } from './geo';
 import { cellFor, cellsAlongMove } from './hex';
 import { levelForXp } from './levels';
 import { rollLoot } from './loot';
-import { gameDay } from './time';
-import type { ApplyResult, GameEvent, GameState, GeoFix, Place, PlaceCatalog, PlaceSet, Reward } from './types';
+import { dailyQuestProgress, dailyQuests, resolveStoryQuests, type StoryQuest } from './quests';
+import { emptyDaily } from './state';
+import { gameDay, gameWeek } from './time';
+import { FOOD_TYPES, type ApplyResult, type GameEvent, type GameState, type GeoFix, type Place, type PlaceCatalog, type PlaceSet, type Reward } from './types';
 
 export interface Engine {
   apply(state: GameState, event: GameEvent, now: number): ApplyResult;
@@ -18,6 +20,7 @@ export interface Engine {
   catalog: PlaceCatalog;
   placeById: ReadonlyMap<string, Place>;
   setsByPlace: ReadonlyMap<string, PlaceSet[]>;
+  storyQuests: StoryQuest[];
 }
 
 export function createEngine(catalog: PlaceCatalog): Engine {
@@ -26,23 +29,30 @@ export function createEngine(catalog: PlaceCatalog): Engine {
   for (const set of catalog.sets) {
     for (const id of set.placeIds) setsByPlace.set(id, [...(setsByPlace.get(id) ?? []), set]);
   }
-  const ctx: EngineContext = { placeById, setsByPlace };
+  const storyQuests = resolveStoryQuests(catalog);
+  const ctx: EngineContext = { placeById, setsByPlace, storyQuests };
 
   return {
     catalog,
     placeById,
     setsByPlace,
+    storyQuests,
     canCheckIn: (state, placeId, now) => checkInEligibility(state, placeId, now, ctx),
     apply(state, event, now) {
       const rolled = rollDay(state, now);
+      let result: ApplyResult;
       switch (event.type) {
         case 'location':
-          return applyLocation(rolled, event.fix, event.creditGpsSteps, now);
+          result = applyLocation(rolled, event.fix, event.creditGpsSteps, now);
+          break;
         case 'steps':
-          return applySteps(rolled, event.delta);
+          result = applySteps(rolled, event.delta);
+          break;
         case 'checkIn':
-          return applyCheckIn(rolled, event.placeId, now, ctx);
+          result = applyCheckIn(rolled, event.placeId, now, ctx);
+          break;
       }
+      return settleDailyQuests(result, now);
     },
   };
 }
@@ -50,13 +60,44 @@ export function createEngine(catalog: PlaceCatalog): Engine {
 interface EngineContext {
   placeById: ReadonlyMap<string, Place>;
   setsByPlace: ReadonlyMap<string, PlaceSet[]>;
+  storyQuests: StoryQuest[];
 }
 
-/** Start a fresh daily counter when the game day changes. */
+/** Start fresh daily counters on a new game day and fresh weekly XP on a new week. */
 function rollDay(state: GameState, now: number): GameState {
   const day = gameDay(now);
-  if (state.daily.day === day) return state;
-  return { ...state, daily: { day, steps: 0, xpSteps: 0 } };
+  const week = gameWeek(now);
+  let next = state;
+  if (next.daily.day !== day) next = { ...next, daily: emptyDaily(day) };
+  if (next.weekly.week !== week) next = { ...next, weekly: { week, xp: 0 } };
+  return next;
+}
+
+/** Rewards any daily quest that the event just completed, plus the all-done streak bonus. */
+function settleDailyQuests(result: ApplyResult, now: number): ApplyResult {
+  let state = result.newState;
+  const rewards = [...result.rewards];
+  const quests = dailyQuests(state.playerSeed, state.daily.day);
+  for (const quest of quests) {
+    if (state.daily.questsDone.includes(quest.id)) continue;
+    if (dailyQuestProgress(state, quest) < quest.target) continue;
+    state = { ...state, daily: { ...state.daily, questsDone: [...state.daily.questsDone, quest.id] }, coins: state.coins + quest.coins };
+    rewards.push({ kind: 'dailyQuestDone', questId: quest.id });
+    state = grantXp(state, quest.xp, 'quest', rewards);
+    rewards.push({ kind: 'coins', amount: quest.coins, source: 'quest' });
+    if (quests.every((q) => state.daily.questsDone.includes(q.id))) {
+      const yesterday = gameDay(now - 24 * 3600_000);
+      const count = state.streak.lastDay === yesterday ? state.streak.count + 1 : 1;
+      state = { ...state, streak: { count, lastDay: state.daily.day } };
+      const factor = Math.min(count, GAME_CONFIG.daily.streakCap);
+      rewards.push({ kind: 'dailyAllDone', streak: count });
+      state = grantXp(state, GAME_CONFIG.daily.allDoneXpBase * factor, 'quest', rewards);
+      const coins = GAME_CONFIG.daily.allDoneCoinsBase * factor;
+      state = { ...state, coins: state.coins + coins };
+      rewards.push({ kind: 'coins', amount: coins, source: 'quest' });
+    }
+  }
+  return rewards.length === result.rewards.length ? result : { ...result, newState: state, rewards };
 }
 
 /** Adds XP, handling level-ups and their coin bonus. */
@@ -72,7 +113,7 @@ function grantXp(state: GameState, amount: number, source: Extract<Reward, { kin
     rewards.push({ kind: 'levelUp', level: reached });
     rewards.push({ kind: 'coins', amount: bonus, source: 'level' });
   }
-  return { ...state, xp, level, coins };
+  return { ...state, xp, level, coins, weekly: { ...state.weekly, xp: state.weekly.xp + amount } };
 }
 
 function countSteps(state: GameState, delta: number, rewards: Reward[]): GameState {
@@ -123,6 +164,7 @@ export function applyLocation(state: GameState, fix: GeoFix, creditGpsSteps: boo
       walkedMeters: state.stats.walkedMeters + verdict.walkedM,
     },
   };
+  if (newCells > 0) next = { ...next, daily: { ...next.daily, hexes: next.daily.hexes + newCells } };
   next = grantXp(next, newCells * GAME_CONFIG.hex.revealXp, 'hex', rewards);
 
   if (creditGpsSteps && verdict.walkedM > 0) {
@@ -167,6 +209,18 @@ export function applyCheckIn(state: GameState, placeId: string, now: number, ctx
     },
   };
   rewards.push(firstVisit ? { kind: 'placeDiscovered', placeId } : { kind: 'placeRevisited', placeId });
+  next = {
+    ...next,
+    daily: {
+      ...next.daily,
+      checkIns: next.daily.checkIns + 1,
+      checkInTypes: { ...next.daily.checkInTypes, [place.type]: (next.daily.checkInTypes[place.type] ?? 0) + 1 },
+    },
+  };
+  if (FOOD_TYPES.includes(place.type) && place.dish && next.dishes[place.dish] == null) {
+    next = { ...next, dishes: { ...next.dishes, [place.dish]: now } };
+    rewards.push({ kind: 'dishUnlocked', dishId: place.dish });
+  }
 
   const baseXp = GAME_CONFIG.places.discoverXp[place.rarity];
   next = grantXp(next, firstVisit ? baseXp : Math.round(baseXp * GAME_CONFIG.places.revisitXpFactor), 'place', rewards);
@@ -177,6 +231,27 @@ export function applyCheckIn(state: GameState, placeId: string, now: number, ctx
   if (loot.itemId) {
     next = { ...next, inventory: { ...next.inventory, [loot.itemId]: (next.inventory[loot.itemId] ?? 0) + 1 } };
     rewards.push({ kind: 'item', itemId: loot.itemId, count: 1 });
+  }
+
+  for (const quest of ctx.storyQuests) {
+    const progress = next.story[quest.id] ?? { step: 0, completedAt: null };
+    if (progress.completedAt != null || quest.stepPlaceIds[progress.step] !== placeId) continue;
+    const step = progress.step + 1;
+    const done = step === quest.stepPlaceIds.length;
+    next = { ...next, story: { ...next.story, [quest.id]: { step, completedAt: done ? now : null } } };
+    rewards.push({ kind: 'storyStep', questId: quest.id, step });
+    if (!done) {
+      next = grantXp(next, GAME_CONFIG.story.stepXp, 'quest', rewards);
+      continue;
+    }
+    rewards.push({ kind: 'storyDone', questId: quest.id });
+    next = grantXp(next, quest.xp, 'quest', rewards);
+    next = { ...next, coins: next.coins + quest.coins };
+    rewards.push({ kind: 'coins', amount: quest.coins, source: 'quest' });
+    if (quest.itemId) {
+      next = { ...next, inventory: { ...next.inventory, [quest.itemId]: (next.inventory[quest.itemId] ?? 0) + 1 } };
+      rewards.push({ kind: 'item', itemId: quest.itemId, count: 1 });
+    }
   }
 
   if (firstVisit) {

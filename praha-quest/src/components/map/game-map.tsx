@@ -89,5 +89,5 @@ export const GameMap = forwardRef<GameMapHandle, GameMapProps>(function GameMap(
 });
 
 const styles = StyleSheet.create({
-  walker: { width: 18, height: 18, borderRadius: 9, backgroundColor: color.gilt, borderWidth: 3, borderColor: color.parchment },
+  walker: { width: 18, height: 18, borderRadius: 9, backgroundColor: color.signRed, borderWidth: 3, borderColor: color.enamel },
 });

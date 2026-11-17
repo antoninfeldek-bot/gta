@@ -7,7 +7,7 @@ import type { PlaceRarity } from './types';
 
 export const GAME_CONFIG = {
   /** Persisted state schema version. Bump together with a migration in migrations.ts. */
-  schemaVersion: 2,
+  schemaVersion: 3,
 
   /** Time zone that defines a "game day" (daily caps, cooldown days, loot seeds). */
   timeZone: 'Europe/Prague',
@@ -87,6 +87,28 @@ export const GAME_CONFIG = {
     perPlaceCoins: 10,
   },
 
+  daily: {
+    /** Quests offered per day. */
+    questsPerDay: 3,
+    /** Reward per quest difficulty tier (0 = easy … 2 = hard). */
+    tierXp: [80, 160, 300],
+    tierCoins: [15, 30, 60],
+    /** Bonus for finishing all of today's quests = base × min(streak, cap). */
+    allDoneXpBase: 100,
+    allDoneCoinsBase: 20,
+    streakCap: 7,
+  },
+
+  story: {
+    /** XP for each step of a story quest except the last. */
+    stepXp: 50,
+  },
+
+  leaderboard: {
+    /** Weeks start on Monday (game time zone). */
+    rivalsJitter: 0.25,
+  },
+
   /**
    * Loot rolled on every successful check-in. Rolls are deterministic
    * (seeded by player, place and game day), so the server can verify them.
@@ -140,3 +162,58 @@ export const ITEM_RARITY: Record<ItemId, PlaceRarity> = {
   'golem-clay': 'epic',
   'crown-shard': 'legendary',
 };
+
+/**
+ * Daily quest templates. Each day three different kinds are drawn with the
+ * player's seed; `targets[tier]` is the goal for that difficulty.
+ */
+export const DAILY_QUEST_POOL = [
+  { kind: 'steps', targets: [3_000, 6_000, 10_000] },
+  { kind: 'hexes', targets: [3, 6, 12] },
+  { kind: 'checkIns', targets: [1, 2, 4] },
+  { kind: 'checkInType', placeType: 'cafe', targets: [1, 1, 2] },
+  { kind: 'checkInType', placeType: 'pub', targets: [1, 1, 2] },
+  { kind: 'checkInType', placeType: 'metro', targets: [1, 2, 3] },
+  { kind: 'checkInType', placeType: 'park', targets: [1, 1, 2] },
+  { kind: 'checkInType', placeType: 'church', targets: [1, 1, 2] },
+  { kind: 'checkInType', placeType: 'viewpoint', targets: [1, 1, 1] },
+] as const;
+
+/**
+ * Story side quests: ordered walks between places, matched by Czech name so
+ * they survive regenerating the place catalogue. Story text lives in i18n.
+ */
+export const STORY_QUESTS = [
+  { id: 'golem', steps: ['Staronová synagoga', 'Karlův most', 'Pražský hrad'], xp: 1_200, coins: 150, itemId: 'golem-clay' },
+  { id: 'alchemist', steps: ['Klementinum', 'Staroměstská mostecká věž', 'Zlatá ulička'], xp: 1_000, coins: 120, itemId: 'alchemist-vial' },
+  { id: 'libuse', steps: ['Vyšehrad', 'Rotunda svatého Martina', 'Pražský hrad'], xp: 1_200, coins: 150, itemId: 'crown-shard' },
+  { id: 'hanus', steps: ['Staroměstský orloj', 'Týnský chrám', 'Staroměstské náměstí'], xp: 800, coins: 100, itemId: null },
+  { id: 'first-republic', steps: ['Kavárna Slavia', 'Café Louvre', 'Grand Café Orient', 'Café Imperial'], xp: 900, coins: 140, itemId: null },
+  { id: 'beer-trail', steps: ['U Zlatého tygra', 'U Medvídků', 'U Fleků'], xp: 900, coins: 140, itemId: null },
+  { id: 'green-line', steps: ['Hradčanská', 'Malostranská', 'Staroměstská', 'Můstek', 'Muzeum'], xp: 700, coins: 90, itemId: 'tram-ticket' },
+  { id: 'bridges', steps: ['Most Legií', 'Karlův most', 'Mánesův most'], xp: 700, coins: 90, itemId: 'old-map' },
+] as const;
+
+/** Fictional Prague characters the player races on the weekly leaderboard. */
+export const RIVALS = [
+  { id: 'hanus', weeklyXp: 9_000 },
+  { id: 'golem', weeklyXp: 6_500 },
+  { id: 'libuse', weeklyXp: 4_800 },
+  { id: 'bruncvik', weeklyXp: 3_200 },
+  { id: 'svejk', weeklyXp: 1_600 },
+  { id: 'turista', weeklyXp: 700 },
+] as const;
+
+/** Rank titles by minimum level. Names live in i18n. */
+export const RANK_TITLES = [
+  { id: 'turista', minLevel: 1 },
+  { id: 'vyletnik', minLevel: 3 },
+  { id: 'naplava', minLevel: 6 },
+  { id: 'prazak-na-zkousku', minLevel: 10 },
+  { id: 'prazak', minLevel: 15 },
+  { id: 'stamgast', minLevel: 22 },
+  { id: 'znalec', minLevel: 30 },
+  { id: 'patriot', minLevel: 45 },
+  { id: 'strazce-orloje', minLevel: 65 },
+  { id: 'karel-iv', minLevel: 90 },
+] as const;

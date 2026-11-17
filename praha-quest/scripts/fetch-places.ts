@@ -44,6 +44,8 @@ area(${PRAGUE_AREA})->.praha;
   nwr["man_made"="tower"]["wikidata"](area.praha);
   nwr["man_made"="bridge"]["wikidata"](area.praha);
   way["bridge"]["wikidata"]["name"](area.praha);
+  nwr["amenity"~"^(cafe|pub|biergarten)$"]["wikidata"](area.praha);
+  nwr["amenity"="marketplace"]["name"](area.praha);
   nwr["station"="subway"](area.praha);
   nwr["railway"="station"]["subway"="yes"](area.praha);
 );
@@ -189,6 +191,8 @@ const EPIC_NAMES = [
   'Trojský zámek',
   'Obora Hvězda',
   'Klementinum',
+  'Kavárna Slavia',
+  'U Fleků',
 ];
 const METRO_TRANSFER = ['Můstek', 'Muzeum', 'Florenc'];
 
@@ -203,6 +207,9 @@ const matchesAny = (name: string, list: string[]) => list.some((n) => norm(name)
 
 function classify(tags: Record<string, string>): PlaceType | null {
   if (tags.station === 'subway' || (tags.railway === 'station' && tags.subway === 'yes')) return 'metro';
+  if (tags.amenity === 'cafe') return 'cafe';
+  if (tags.amenity === 'pub' || tags.amenity === 'biergarten') return 'pub';
+  if (tags.amenity === 'marketplace') return 'food';
   if (tags.tourism === 'viewpoint') return 'viewpoint';
   if (tags.tourism === 'museum') return 'museum';
   if (tags.man_made === 'bridge' || tags.bridge) return 'bridge';
@@ -224,6 +231,14 @@ function rarityFor(name: string, type: PlaceType, tags: Record<string, string>):
 
 // Skip noise: memorial plaques, wayside crosses, boundary stones, etc.
 const SKIP_HISTORIC = new Set(['memorial', 'wayside_cross', 'wayside_shrine', 'boundary_stone', 'milestone', 'stone', 'tomb', 'grave', 'yes']);
+
+/** Cookbook dishes a food place can unlock (ids match src/i18n/cs-content.ts). */
+const DISHES: Partial<Record<PlaceType, string[]>> = {
+  cafe: ['vetrnik', 'rakvicka', 'laskonka', 'kolac', 'medovnik', 'spicka'],
+  pub: ['svickova', 'hermelin', 'gulas', 'vepro-knedlo-zelo', 'smazak', 'utopenec', 'rizek'],
+  food: ['bramborak', 'trdelnik'],
+};
+const hash = (s: string) => [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
 
 const RARITY_RANK: Record<PlaceRarity, number> = { common: 0, rare: 1, epic: 2, legendary: 3 };
 
@@ -251,7 +266,7 @@ async function main() {
     const type = classify(tags);
     if (!type) continue;
     if (type === 'landmark' && tags.historic && SKIP_HISTORIC.has(tags.historic) && tags.tourism !== 'attraction') continue;
-    if (type !== 'metro' && type !== 'viewpoint' && !tags.wikidata) continue;
+    if (type !== 'metro' && type !== 'viewpoint' && type !== 'food' && !tags.wikidata) continue;
     const lat = el.lat ?? el.center?.lat;
     const lng = el.lon ?? el.center?.lon;
     if (lat == null || lng == null) continue;
@@ -264,6 +279,7 @@ async function main() {
       lng,
       district: districtFor(lat, lng),
       ...(tags.wikidata ? { wikidata: tags.wikidata } : {}),
+      ...(DISHES[type] ? { dish: DISHES[type]![hash(String(el.id)) % DISHES[type]!.length] } : {}),
       rarity,
       score: RARITY_RANK[rarity] * 10 + (tags.wikidata ? 2 : 0) + (el.type === 'node' ? 1 : 0),
     });
@@ -322,6 +338,9 @@ async function main() {
     { id: 'towers', nameCs: 'Pražské věže', placeIds: byType('tower') },
     { id: 'museums', nameCs: 'Muzea', placeIds: byType('museum') },
     { id: 'parks', nameCs: 'Parky a zahrady', placeIds: byType('park') },
+    { id: 'cafes', nameCs: 'Prvorepublikové kavárny', placeIds: byType('cafe') },
+    { id: 'pubs', nameCs: 'Pivní mapa Prahy', placeIds: byType('pub') },
+    { id: 'food-all', nameCs: 'Mlsná Praha', placeIds: [...byType('cafe'), ...byType('pub'), ...byType('food')] },
     { id: 'legends', nameCs: 'Legendy Prahy', placeIds: places.filter((p) => p.rarity === 'legendary').map((p) => p.id) },
     {
       id: 'old-town-royal-route',

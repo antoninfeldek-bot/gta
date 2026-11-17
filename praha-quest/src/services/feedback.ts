@@ -6,7 +6,8 @@ import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from 'expo-aud
 import * as Haptics from 'expo-haptics';
 import { APP_CONFIG } from '@/app-config';
 import type { Reward } from '@/game';
-import { t } from '@/i18n';
+import { t, tc } from '@/i18n';
+import { dailyQuests } from '@/game';
 import { engine, useGameStore } from '@/store/game-store';
 import { useFeedStore } from '@/store/feed-store';
 import { onRewards } from './reward-bus';
@@ -19,6 +20,8 @@ const SOURCES: Record<Sfx, number> = {
 };
 let players: Partial<Record<Sfx, AudioPlayer>> = {};
 let lastRevealSfx = 0;
+
+const cheer = () => tc.cheers[Math.floor(Math.random() * tc.cheers.length)];
 
 function play(sfx: Sfx) {
   if (!useGameStore.getState().settings.sound) return;
@@ -69,6 +72,7 @@ function handle(rewards: Reward[]) {
       feed.push({
         tone: 'place',
         rarity: place?.rarity,
+        cheer: r.kind === 'placeDiscovered' && (place?.rarity === 'legendary' || place?.rarity === 'epic') ? cheer() : undefined,
         title: `${r.kind === 'placeDiscovered' ? t.rewards.placeDiscovered : t.rewards.placeRevisited}: ${place?.nameCs ?? ''}`,
         detail: `${t.rewards.xp(sumXp('place'))}${coins}`,
       });
@@ -76,9 +80,33 @@ function handle(rewards: Reward[]) {
       buzz('success');
     }
     if (r.kind === 'item') feed.push({ tone: 'item', title: t.rewards.item, detail: t.items[r.itemId]?.name ?? r.itemId });
+    if (r.kind === 'dishUnlocked') {
+      feed.push({ tone: 'food', title: t.rewards.dish, detail: tc.dishes[r.dishId]?.name ?? r.dishId });
+    }
+    if (r.kind === 'dailyQuestDone') {
+      const game = useGameStore.getState().game;
+      const quest = dailyQuests(game.playerSeed, game.daily.day).find((q) => q.id === r.questId);
+      feed.push({ tone: 'quest', title: t.rewards.dailyQuest, detail: quest ? t.quests.reward(quest.xp, quest.coins) : undefined });
+      play('claim');
+      buzz('success');
+    }
+    if (r.kind === 'dailyAllDone') {
+      feed.push({ tone: 'quest', cheer: cheer(), title: t.rewards.dailyAll(r.streak) });
+    }
+    if (r.kind === 'storyStep') {
+      const quest = tc.storyQuests[r.questId];
+      if (quest && r.step < quest.steps.length) {
+        feed.push({ tone: 'quest', title: `${t.rewards.storyStep}: ${quest.title}`, detail: `${r.step}/${quest.steps.length}` });
+      }
+    }
+    if (r.kind === 'storyDone') {
+      feed.push({ tone: 'quest', cheer: cheer(), title: `${t.rewards.storyDone}: ${tc.storyQuests[r.questId]?.title ?? ''}` });
+      play('level');
+      buzz('heavy');
+    }
     if (r.kind === 'setCompleted') {
       const set = engine.catalog.sets.find((s) => s.id === r.setId);
-      feed.push({ tone: 'set', title: `${t.rewards.setCompleted}: ${set?.nameCs ?? ''}`, detail: t.rewards.xp(sumXp('set')) });
+      feed.push({ tone: 'set', cheer: cheer(), title: `${t.rewards.setCompleted}: ${set?.nameCs ?? ''}`, detail: t.rewards.xp(sumXp('set')) });
     }
   }
 

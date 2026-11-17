@@ -3,6 +3,7 @@
  * shape can be added later and picked in src/i18n/index.ts.
  */
 import type { CheckInFailure, PlaceRarity, PlaceType, RejectReason } from '@/game/types';
+import * as content from './cs-content';
 
 const plural = (n: number, one: string, few: string, many: string) =>
   n === 1 ? one : n >= 2 && n <= 4 ? few : many;
@@ -12,8 +13,48 @@ export const cs = {
 
   tabs: {
     map: 'Mapa',
+    quests: 'Úkoly',
     collection: 'Sbírka',
+    leaderboard: 'Žebříček',
     profile: 'Hrdina',
+  },
+
+  quests: {
+    title: 'Úkoly',
+    dailyTitle: 'Dnešní úkoly',
+    dailyHint: 'Nové úkoly každé ráno o půlnoci.',
+    streak: (n: number) => (n === 0 ? 'Zatím žádná série' : `Série ${n} ${n === 1 ? 'den' : n <= 4 ? 'dny' : 'dní'} v kuse`),
+    allDoneBonus: 'Splň všechny tři a série roste. Za každý den v řadě větší bonus.',
+    reward: (xp: number, coins: number) => `+${fmt(xp)} XP, +${coins} grošů`,
+    done: 'Splněno',
+    storyTitle: 'Pověsti a výpravy',
+    storyHint: 'Projdi místa v daném pořadí. Na každém dej Zabrat místo.',
+    storyStep: (step: number, total: number) => `Zastávka ${step} z ${total}`,
+    storyNext: 'Další zastávka',
+    storyDone: 'Dokončeno',
+    storyStart: 'Začni tady',
+    showOnMap: 'Ukázat na mapě',
+  },
+
+  leaderboard: {
+    title: 'Žebříček',
+    weekTitle: 'Tenhle týden',
+    weekHint: 'XP za tento týden. Počítadlo se nuluje v pondělí.',
+    you: 'Ty',
+    rank: (n: number) => `${n}.`,
+    districtsTitle: 'Tvoje Praha po čtvrtích',
+    districtsHint: 'Kolik míst v každé městské části už máš.',
+    districtsEmpty: 'Zatím žádná čtvrť. Zaber první místo.',
+    behind: (xp: number, name: string) => `${name} je před tebou o ${fmt(xp)} XP.`,
+    leading: 'Vedeš. Praha je tvoje.',
+  },
+
+  cookbook: {
+    title: 'Kuchařka',
+    hint: 'Každá kavárna, hospoda a trh ti odemkne jedno české jídlo.',
+    locked: 'Zamčeno',
+    unlockAt: (place: string) => `Odemkne se na místě ${place}.`,
+    count: (n: number, total: number) => `${n} z ${total} receptů`,
   },
 
   hud: {
@@ -82,6 +123,12 @@ export const cs = {
     levelUp: 'Nový level',
     levelUpBody: (level: number) => `Teď jsi na levelu ${level}. Praha tě začíná znát.`,
     levelUpButton: 'Jdu dál',
+    dish: 'Nový recept v Kuchařce',
+    dailyQuest: 'Úkol splněn',
+    dailyAll: (streak: number) => `Všechny dnešní úkoly! Série ${streak}`,
+    storyStep: 'Výprava pokračuje',
+    storyDone: 'Výprava dokončena',
+    newRank: 'Nový titul',
   },
 
   rarity: {
@@ -100,6 +147,9 @@ export const cs = {
     metro: 'Stanice metra',
     bridge: 'Most',
     tower: 'Věž',
+    cafe: 'Kavárna',
+    pub: 'Hospoda',
+    food: 'Jídlo a trhy',
   } satisfies Record<PlaceType, string>,
 
   items: {
@@ -164,6 +214,8 @@ export const cs = {
     mapUnavailableBody: 'Otevři hru v Expo Go na iPhonu nebo Androidu. Sbírku a profil si můžeš prohlédnout i tady.',
   },
 };
+
+export const csContent = content;
 
 export type Strings = typeof cs;
 

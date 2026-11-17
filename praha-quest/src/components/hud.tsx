@@ -2,13 +2,14 @@ import { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { GAME_CONFIG, levelProgress } from '@/game';
-import { formatNumber, t } from '@/i18n';
+import { GAME_CONFIG, levelProgress, rankTitle } from '@/game';
+import { formatNumber, t, tc } from '@/i18n';
 import { useGameStore } from '@/store/game-store';
-import { color, font, radius, size, space } from '@/theme';
-import { HexShape } from './hex-shape';
+import { color, font, frame, radius, size, space } from '@/theme';
+import { CoatOfArms } from './coat-of-arms';
+import { HousePlate } from './house-plate';
 
-/** Top-of-map HUD: the level seal with its XP bar, then coins and today's steps. */
+/** Top-of-map HUD as an enamel plate: coat of arms, level plate, rank, XP bar, coins and steps. */
 export function Hud() {
   const insets = useSafeAreaInsets();
   const xp = useGameStore((s) => s.game.xp);
@@ -24,30 +25,24 @@ export function Hud() {
   const barStyle = useAnimatedStyle(() => ({ width: `${Math.min(1, fill.value) * 100}%` }));
 
   return (
-    <View style={[styles.wrap, { paddingTop: insets.top + space.sm }]} pointerEvents="box-none">
-      <View style={styles.row} pointerEvents="none">
-        <View style={styles.seal} accessibilityLabel={`${t.hud.level} ${progress.level}`}>
-          <HexShape size={62} fill={color.night} stroke={color.gilt} strokeWidth={2.5} />
-          <View style={[StyleSheet.absoluteFill, styles.center]}>
-            <Text style={styles.sealNumber}>{progress.level}</Text>
-          </View>
-        </View>
+    <View style={[styles.wrap, { paddingTop: insets.top + space.sm }]} pointerEvents="none">
+      <View style={styles.plate}>
+        <CoatOfArms size={30} />
+        <HousePlate value={progress.level} size={44} />
         <View style={styles.xpCol}>
-          <Text style={styles.levelLabel}>
-            {t.hud.level} {progress.level}
+          <Text style={styles.rank} numberOfLines={1}>
+            {tc.ranks[rankTitle(progress.level)].toLocaleUpperCase('cs')}
           </Text>
           <View style={styles.track}>
             <Animated.View style={[styles.bar, barStyle]} />
           </View>
-          <Text style={styles.xpText}>
-            {progress.needed > 0 ? t.hud.xpToNext(progress.current, progress.needed) : t.hud.maxLevel}
-          </Text>
+          <Text style={styles.xpText}>{progress.needed > 0 ? t.hud.xpToNext(progress.current, progress.needed) : t.hud.maxLevel}</Text>
         </View>
         <View style={styles.stats}>
           <Text style={styles.statValue}>
             {formatNumber(coins)} <Text style={styles.statUnit}>{t.hud.coins}</Text>
           </Text>
-          <Text style={[styles.statValue, capped && { color: color.parchmentDim }]}>
+          <Text style={[styles.statValue, capped && { color: color.inkMute }]}>
             {formatNumber(steps)} <Text style={styles.statUnit}>{t.hud.stepsToday}</Text>
           </Text>
         </View>
@@ -57,28 +52,29 @@ export function Hud() {
 }
 
 const styles = StyleSheet.create({
-  wrap: { position: 'absolute', top: 0, left: 0, right: 0, paddingHorizontal: space.lg },
-  row: {
+  wrap: { position: 'absolute', top: 0, left: 0, right: 0, paddingHorizontal: space.md },
+  plate: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: space.md,
-    backgroundColor: 'rgba(15,28,38,0.92)',
-    borderRadius: radius.panel,
+    gap: space.sm,
+    backgroundColor: color.enamel,
+    borderColor: color.signRed,
+    borderWidth: frame,
+    borderRadius: radius.plate,
     paddingVertical: space.sm,
-    paddingLeft: space.sm,
-    paddingRight: space.lg,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: color.slateHigh,
+    paddingHorizontal: space.sm,
+    shadowColor: '#000',
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 6,
   },
-  seal: { width: 62, height: 62 },
-  center: { alignItems: 'center', justifyContent: 'center' },
-  sealNumber: { fontFamily: font.displayBlack, fontSize: 24, color: color.gilt, marginTop: -1 },
-  xpCol: { flex: 1, gap: 5 },
-  levelLabel: { fontFamily: font.display, fontSize: size.body, color: color.parchment },
-  track: { height: 6, borderRadius: 3, backgroundColor: color.slateHigh, overflow: 'hidden' },
-  bar: { height: '100%', backgroundColor: color.gilt, borderRadius: 3 },
-  xpText: { fontFamily: font.body, fontSize: size.caption, color: color.parchmentDim },
-  stats: { alignItems: 'flex-end', gap: 2 },
-  statValue: { fontFamily: font.bodyBold, fontSize: size.small, color: color.parchment, fontVariant: ['tabular-nums'] },
-  statUnit: { fontFamily: font.body, fontSize: size.caption, color: color.parchmentDim },
+  xpCol: { flex: 1, gap: 3, minWidth: 0 },
+  rank: { fontFamily: font.signHeavy, fontSize: 17, letterSpacing: 0.6, color: color.ink },
+  track: { height: 6, borderRadius: 3, backgroundColor: color.enamelShade, overflow: 'hidden' },
+  bar: { height: '100%', backgroundColor: color.signRed, borderRadius: 3 },
+  xpText: { fontFamily: font.bodyMedium, fontSize: size.caption, color: color.inkSoft, fontVariant: ['tabular-nums'] },
+  stats: { alignItems: 'flex-end', gap: 1 },
+  statValue: { fontFamily: font.signHeavy, fontSize: 17, color: color.ink, fontVariant: ['tabular-nums'] },
+  statUnit: { fontFamily: font.bodyMedium, fontSize: 11, color: color.inkSoft },
 });
